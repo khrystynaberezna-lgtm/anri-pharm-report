@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANRI-PHARM — Бізнес-огляд Bolt Food</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+:root{--bg:#F8F9FA;--card:#fff;--border:#e5e7eb;--text:#1A1A2E;--muted:#6b7280;--green:#34D186;--red:#dc2626;--yellow:#ca8a04;--blue:#2563eb;--purple:#7c3aed;--cyan:#0891b2;--orange:#ea580c;--accent:#34D186;--accent-dark:#1A1A2E}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,system-ui,sans-serif;line-height:1.65}
+.container{max-width:1380px;margin:0 auto;padding:28px}
+.header{display:flex;align-items:center;gap:20px;margin-bottom:32px;padding-bottom:24px;border-bottom:2px solid var(--border)}
+.logo-dot{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#34D186,#1A1A2E);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px}
+h1{font-size:24px;font-weight:700;color:var(--accent-dark)}
+.subtitle{color:var(--muted);font-size:13px;margin-top:2px}
+.report-meta{margin-left:auto;text-align:right;color:var(--muted);font-size:12px}
+.updated-badge{display:inline-flex;align-items:center;gap:7px;background:var(--green);color:#fff;font-weight:700;font-size:13px;padding:7px 14px;border-radius:99px;box-shadow:0 1px 4px rgba(52,209,134,0.4)}
+.updated-badge .dot{width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px rgba(255,255,255,0.4)}
+h2{font-size:18px;font-weight:700;margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border);color:var(--accent-dark)}
+h3{font-size:14px;font-weight:600;margin-bottom:10px}
+.section{margin-bottom:36px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.grid-6{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;box-shadow:0 1px 3px rgba(0,0,0,0.04)}
+.kpi{text-align:center;padding:16px 12px}
+.kpi-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px;line-height:1.3}
+.kpi-value{font-size:26px;font-weight:700}
+.kpi-sub{font-size:11px;margin-top:4px;font-weight:600}
+.up{color:var(--green)}.down{color:var(--red)}.neutral{color:var(--yellow)}.stable{color:var(--muted)}
+.chart-box{position:relative;height:280px}
+.chart-box-lg{position:relative;height:340px}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{text-align:left;padding:8px 10px;border-bottom:2px solid var(--border);color:var(--muted);font-weight:600;font-size:10px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid #f3f4f6}
+tr:hover{background:#f9fafb}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:600}
+.badge-g{background:#dcfce7;color:#166534}.badge-r{background:#fee2e2;color:#991b1b}.badge-y{background:#fef9c3;color:#854d0e}.badge-b{background:#dbeafe;color:#1e40af}
+.insight{border-left:3px solid var(--blue);background:#eff6ff;border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:10px;font-size:13px}
+.insight.warn{border-color:var(--orange);background:#fff7ed}
+.insight.good{border-color:var(--green);background:#f0fdf4}
+.insight.action{border-color:var(--purple);background:#f5f3ff}
+.insight-title{font-weight:600;margin-bottom:3px}
+.insight-text{color:var(--muted);font-size:12px}
+.me{color:var(--muted);font-size:10px;font-style:italic;display:block;margin-top:1px}
+.divider{height:1px;background:var(--border);margin:28px 0}
+.store-row{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.store-name{font-size:11px;min-width:340px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar-bg{flex:1;height:18px;background:#f3f4f6;border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;min-width:4px}
+.bar-val{font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;min-width:150px}
+
+/* Tab navigation */
+.tab-nav{display:flex;gap:4px;margin-bottom:24px;border-bottom:2px solid var(--border);padding-bottom:0}
+.tab-btn{padding:10px 24px;font-size:14px;font-weight:600;border:none;background:transparent;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:all .2s}
+.tab-btn.active{color:var(--accent-dark);border-bottom-color:var(--accent)}
+.tab-btn:hover{color:var(--accent-dark)}
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* Activity tab */
+.act-table td{text-align:center;font-variant-numeric:tabular-nums}
+.act-table td.store{text-align:left;white-space:nowrap;max-width:300px;overflow:hidden;text-overflow:ellipsis}
+.act-table td.rank{font-weight:700;color:var(--muted);width:34px}
+.act-table th.week{text-align:center}
+.heat{display:inline-block;min-width:46px;padding:3px 6px;border-radius:5px;font-weight:600;font-size:11px;color:#1a1a2e}
+.tier{display:inline-block;width:9px;height:9px;border-radius:99px;margin-right:6px;vertical-align:middle}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:11px;color:var(--muted);margin:6px 0 14px}
+.legend span b{color:var(--text)}
+.trend-up{color:var(--green);font-weight:600}
+.trend-down{color:var(--red);font-weight:600}
+.trend-flat{color:var(--muted)}
+
+@media(max-width:900px){.grid-2,.grid-3,.grid-4,.grid-6{grid-template-columns:1fr}}
+@media print{body{background:#fff}.card{box-shadow:none;border:1px solid #ddd}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <div class="logo-dot">AP</div>
+  <div>
+    <h1>ANRI-PHARM — Бізнес-огляд</h1>
+    <div class="subtitle" id="reportSubtitle">Bolt Food UA · Завантаження...</div>
+  </div>
+  <div class="report-meta" id="reportMeta">Завантаження...</div>
+</div>
+
+<!-- Tab Navigation -->
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="monthly">Місячні дані</button>
+  <button class="tab-btn" data-tab="weekly">Тижневі дані</button>
+  <button class="tab-btn" data-tab="activity">Активність локацій</button>
+</div>
+
+<!-- ═══════════════════════════════════════ -->
+<!-- MONTHLY TAB -->
+<!-- ═══════════════════════════════════════ -->
+<div class="tab-content active" id="tab-monthly">
+
+<!-- KPI SUMMARY -->
+<div class="section" id="m-kpi">
+  <h2>Ключові показники (останній завершений місяць)</h2>
+  <div class="grid-6" id="m-kpi-cards"></div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 1. GROWTH & SALES -->
+<div class="section" id="m-sales">
+  <h2>1. Зростання та обсяги продажів</h2>
+  <div class="grid-2">
+    <div class="card"><h3>Продажі партнера, ₴</h3><div class="chart-box"><canvas id="m-cGMV"></canvas></div></div>
+    <div class="card"><h3>Доставлені / Розміщені замовлення</h3><div class="chart-box"><canvas id="m-cOrders"></canvas></div></div>
+  </div>
+  <div class="grid-2" style="margin-top:14px">
+    <div class="card"><h3>Середній чек партнера, ₴</h3><div class="chart-box"><canvas id="m-cAOV"></canvas></div></div>
+    <div class="card"><h3>Нові / Активні користувачі</h3><div class="chart-box"><canvas id="m-cUsers"></canvas></div></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3>Динаміка продажів</h3>
+    <div style="overflow-x:auto"><table id="m-sales-table"></table></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 2. OPERATIONS DEEP DIVE -->
+<div class="section" id="m-ops">
+  <h2>2. Операційна якість — детальний аналіз</h2>
+  <div class="grid-2">
+    <div class="card"><h3>Частка невдалих / проблемних замовлень, %</h3><div class="chart-box"><canvas id="m-cFail"></canvas></div></div>
+    <div class="card"><h3>Частка якісних замовлень (Honey), %</h3><div class="chart-box"><canvas id="m-cHoney"></canvas></div></div>
+  </div>
+  <div class="grid-2" style="margin-top:14px">
+    <div class="card"><h3>Час доставки / Час кур'єра, хв</h3><div class="chart-box"><canvas id="m-cDuration"></canvas></div></div>
+    <div class="card"><h3>Запізнення доставки / збирання, %</h3><div class="chart-box"><canvas id="m-cLate"></canvas></div></div>
+  </div>
+  <div class="divider" style="margin:20px 0"></div>
+  <h3 style="font-size:16px;margin-bottom:14px">Коригування та заміна товарів</h3>
+  <div class="grid-2">
+    <div class="card"><h3>Коригування замовлень (Adjustment), %</h3><div class="chart-box"><canvas id="m-cAdjust"></canvas></div></div>
+    <div class="card"><h3>Заміна товарів (Replacement), %</h3><div class="chart-box"><canvas id="m-cReplace"></canvas></div></div>
+  </div>
+  <div class="insight" style="margin-top:10px">
+    <div class="insight-text">Заміна товарів (Replacement) є підмножиною коригувань (Adjustment). Тобто Replacement — це лише частина від загального Adjustment Rate, коли товар замінюється на інший, а не просто коригується ціна чи кількість.</div>
+  </div>
+  <div class="divider" style="margin:20px 0"></div>
+  <h3 style="font-size:16px;margin-bottom:14px">Активні заклади, доступність та рейтинг</h3>
+  <div class="grid-2">
+    <div class="card"><h3>Активні заклади / Доступність, %</h3><div class="chart-box"><canvas id="m-cMerchants"></canvas></div></div>
+    <div class="card"><h3>Рейтинг закладів від клієнтів</h3><div class="chart-box"><canvas id="m-cRating"></canvas></div></div>
+  </div>
+  <div class="divider" style="margin:20px 0"></div>
+  <h3 style="font-size:16px;margin-bottom:14px">Активація мережі</h3>
+  <div class="grid-3" id="m-activation-cards"></div>
+  <div class="grid-2" style="margin-top:14px">
+    <div class="card"><h3>Активні заклади та нові підключення по місяцях</h3><div class="chart-box"><canvas id="m-cActivation"></canvas></div></div>
+    <div class="card"><h3>Накопичено активованих закладів</h3><div class="chart-box"><canvas id="m-cActivationCum"></canvas></div></div>
+  </div>
+  <div class="insight action" style="margin-top:12px" id="m-activation-note"></div>
+  <div class="card" style="margin-top:14px">
+    <h3>Зведена таблиця операційних показників</h3>
+    <div style="overflow-x:auto"><table id="m-ops-table"></table></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 3. FAILED ORDERS ANALYSIS -->
+<div class="section" id="m-failed">
+  <h2>3. Аналіз невдалих замовлень</h2>
+  <div class="grid-2">
+    <div class="card"><h3>Невдалі замовлення за причинами</h3><div class="chart-box-lg"><canvas id="m-cFailReasons"></canvas></div></div>
+    <div class="card"><h3>Динаміка частки невдалих, %</h3><div class="chart-box-lg"><canvas id="m-cFailRate"></canvas></div></div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <h3>Деталізація невдалих замовлень за причинами</h3>
+    <div style="overflow-x:auto"><table id="m-fail-table"></table></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 5. MERCHANT NETWORK -->
+<div class="section" id="m-merchants">
+  <h2>5. Мережа закладів</h2>
+  <div class="card">
+    <h3 id="m-top-stores-title">Топ-15 закладів за продажами</h3>
+    <div id="m-top-stores"></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 6. FULL KPI TABLE -->
+<div class="section" id="m-trends">
+  <h2>6. Зведена таблиця за всі місяці</h2>
+  <div class="card" style="overflow-x:auto"><table id="m-kpi-table"></table></div>
+</div>
+
+</div><!-- end monthly tab -->
+
+
+<!-- ═══════════════════════════════════════ -->
+<!-- WEEKLY TAB -->
+<!-- ═══════════════════════════════════════ -->
+<div class="tab-content" id="tab-weekly">
+
+<!-- KPI SUMMARY -->
+<div class="section">
+  <h2 id="w-kpi-title">Ключові показники (останній повний тиждень)</h2>
+  <div class="grid-6" id="w-kpi-cards"></div>
+</div>
+
+<!-- 1. GROWTH & SALES -->
+<div class="section">
+  <h2>1. Зростання та обсяги продажів</h2>
+  <div class="grid-2">
+    <div class="card"><h3>Продажі партнера, ₴</h3><div class="chart-box"><canvas id="w-cGMV"></canvas></div></div>
+    <div class="card"><h3>Доставлені / Розміщені замовлення</h3><div class="chart-box"><canvas id="w-cOrders"></canvas></div></div>
+  </div>
+  <div class="grid-2" style="margin-top:14px">
+    <div class="card"><h3>Середній чек партнера, ₴</h3><div class="chart-box"><canvas id="w-cAOV"></canvas></div></div>
+    <div class="card"><h3>Нові / Активні користувачі</h3><div class="chart-box"><canvas id="w-cUsers"></canvas></div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 2. OPERATIONS -->
+<div class="section">
+  <h2>2. Операційна якість — детальний аналіз</h2>
+  <div class="grid-2">
+    <div class="card"><h3>Частка невдалих / проблемних замовлень, %</h3><div class="chart-box"><canvas id="w-cFail"></canvas></div></div>
+    <div class="card"><h3>Частка якісних замовлень (Honey), %</h3><div class="chart-box"><canvas id="w-cHoney"></canvas></div></div>
+  </div>
+  <div class="grid-2" style="margin-top:14px">
+    <div class="card"><h3>Час доставки / Час кур'єра, хв</h3><div class="chart-box"><canvas id="w-cDuration"></canvas></div></div>
+    <div class="card"><h3>Запізнення доставки / збирання, %</h3><div class="chart-box"><canvas id="w-cLate"></canvas></div></div>
+  </div>
+  <div class="divider" style="margin:20px 0"></div>
+  <h3 style="font-size:16px;margin-bottom:14px">Коригування та заміна товарів</h3>
+  <div class="grid-2">
+    <div class="card"><h3>Коригування замовлень (Adjustment), %</h3><div class="chart-box"><canvas id="w-cAdjust"></canvas></div></div>
+    <div class="card"><h3>Заміна товарів (Replacement), %</h3><div class="chart-box"><canvas id="w-cReplace"></canvas></div></div>
+  </div>
+  <div class="insight" style="margin-top:10px">
+    <div class="insight-text">Заміна товарів (Replacement) є підмножиною коригувань (Adjustment). Тобто Replacement — це лише частина від загального Adjustment Rate, коли товар замінюється на інший, а не просто коригується ціна чи кількість.</div>
+  </div>
+  <div class="divider" style="margin:20px 0"></div>
+  <h3 style="font-size:16px;margin-bottom:14px">Активні заклади, доступність та рейтинг</h3>
+  <div class="grid-2">
+    <div class="card"><h3>Активні заклади / Доступність, %</h3><div class="chart-box"><canvas id="w-cMerchants"></canvas></div></div>
+    <div class="card"><h3>Рейтинг закладів від клієнтів</h3><div class="chart-box"><canvas id="w-cRating"></canvas></div></div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- 3. FAILED ORDERS -->
+<div class="section">
+  <h2>3. Аналіз невдалих замовлень</h2>
+  <div class="grid-2">
+    <div class="card"><h3>Невдалі замовлення за причинами</h3><div class="chart-box-lg"><canvas id="w-cFailReasons"></canvas></div></div>
+    <div class="card"><h3>Динаміка частки невдалих, %</h3><div class="chart-box-lg"><canvas id="w-cFailRate"></canvas></div></div>
+  </div>
+</div>
+
+
+</div><!-- end weekly tab -->
+
+
+<!-- ═══════════════════════════════════════ -->
+<!-- ACTIVITY TAB (per-store, last 4 weeks)  -->
+<!-- ═══════════════════════════════════════ -->
+<div class="tab-content" id="tab-activity">
+
+  <div class="section">
+    <h2 id="a-title">Активність локацій за останні 4 тижні</h2>
+    <div class="insight" style="margin-bottom:16px">
+      <div class="insight-text">
+        <b>Доступність (Availability)</b> — частка часу, коли заклад онлайн і приймає замовлення (головна метрика активності).
+        <b>Прийняття (Acceptance)</b> — частка прийнятих замовлень із отриманих.
+        <b>Неактивність (Inactive)</b> = 100% − Доступність. Рейтинг побудовано за середньою доступністю за 4 тижні: від найактивніших до неактивних.
+      </div>
+    </div>
+    <div class="grid-4" id="a-kpi-cards"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <h2>Динаміка доступності мережі по тижнях</h2>
+    <div class="grid-2">
+      <div class="card"><h3>Середня доступність та прийняття мережі, %</h3><div class="chart-box"><canvas id="a-cNetwork"></canvas></div></div>
+      <div class="card"><h3>Розподіл локацій за рівнем активності</h3><div class="chart-box"><canvas id="a-cTiers"></canvas></div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <h2>Інсайти</h2>
+    <div id="a-insights"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <h2>Рейтинг локацій за доступністю (4 тижні)</h2>
+    <div class="legend">
+      <span><span class="tier" style="background:#16a34a"></span><b>Активна</b> ≥ 85%</span>
+      <span><span class="tier" style="background:#84cc16"></span><b>Помірна</b> 60–85%</span>
+      <span><span class="tier" style="background:#eab308"></span><b>Низька</b> 30–60%</span>
+      <span><span class="tier" style="background:#f97316"></span><b>Критична</b> 1–30%</span>
+      <span><span class="tier" style="background:#dc2626"></span><b>Неактивна</b> 0%</span>
+    </div>
+    <div class="card" style="overflow-x:auto"><table class="act-table" id="a-table"></table></div>
+    <div class="insight" style="margin-top:12px">
+      <div class="insight-text">Колір комірок — рівень доступності за тиждень. Стовпець <b>Тренд</b> порівнює останній тиждень із першим (зміна в процентних пунктах). У дужках під доступністю — прийняття замовлень (Acc).</div>
+    </div>
+  </div>
+
+</div><!-- end activity tab -->
+
+<div style="text-align:center;color:var(--muted);font-size:11px;margin-top:40px;padding:20px 0;border-top:1px solid var(--border)">
+  ANRI-PHARM × Bolt Food UA · Бізнес-огляд · Конфіденційно
+</div>
+
+</div><!-- end container -->
+
+<script>
+const REPORT_DATA = {"generated_at": "2026-09-24 13:44 UTC", "data_start": "2025-01-01", "data_end": "2026-08-31", "weekly_start": "2026-08-24", "weekly_end": "2026-09-20", "partner_name": "ANRI-PHARM", "partner_display": "ANRI-PHARM", "monthly": {"financial": [{"period": "2026-05", "orders": 92.0, "merchant_price_uah": 38353.94, "merchant_price_per_order": 416.89065217391305, "gmv_uah": 49204.74, "aov_uah": 534.8341304347827, "users_activated": 8.0, "active_users": 84.0, "refund_rate_pct": 0.25678420102234273, "eur_uah_rate": 51.44656870436983}, {"period": "2026-06", "orders": 512.0, "merchant_price_uah": 223172.79, "merchant_price_per_order": 435.88435546875, "gmv_uah": 278149.49, "aov_uah": 543.26072265625, "users_activated": 21.0, "active_users": 451.0, "refund_rate_pct": 1.0064983331881492, "eur_uah_rate": 51.50918888802462}, {"period": "2026-07", "orders": 601.0, "merchant_price_uah": 257055.82, "merchant_price_per_order": 427.7135108153078, "gmv_uah": 315802.32, "aov_uah": 525.4614309484193, "users_activated": 27.0, "active_users": 497.0, "refund_rate_pct": 0.3129964378371354, "eur_uah_rate": 51.04651246308415}, {"period": "2026-08", "orders": 650.0, "merchant_price_uah": 293632.27, "merchant_price_per_order": 451.7419538461538, "gmv_uah": 353614.47, "aov_uah": 544.0222615384615, "users_activated": 34.0, "active_users": 544.0, "refund_rate_pct": 0.693622624002837, "eur_uah_rate": 51.740348394379694}], "operational": [{"period": "2026-05", "delivered_orders": 92.0, "active_stores": 26.0, "honey_order_rate": 36.95652173913043, "bad_order_rate": 32.608695652173914, "late_delivery_rate": 46.73913043478261, "late_pickup_rate": 26.08695652173913, "avg_delivery_minutes": 49.98641304347827, "avg_courier_delivery_min": 48.27590579710145}, {"period": "2026-06", "delivered_orders": 512.0, "active_stores": 43.0, "honey_order_rate": 53.7109375, "bad_order_rate": 11.9140625, "late_delivery_rate": 25.0, "late_pickup_rate": 16.6015625, "avg_delivery_minutes": 35.93688151041665, "avg_courier_delivery_min": 33.65764973958334}, {"period": "2026-07", "delivered_orders": 601.0, "active_stores": 53.0, "honey_order_rate": 59.900166389351085, "bad_order_rate": 7.154742096505824, "late_delivery_rate": 24.459234608985025, "late_pickup_rate": 16.80532445923461, "avg_delivery_minutes": 38.567054908485865, "avg_courier_delivery_min": 30.444537346711257}, {"period": "2026-08", "delivered_orders": 650.0, "active_stores": 54.0, "honey_order_rate": 60.46153846153847, "bad_order_rate": 6.923076923076923, "late_delivery_rate": 25.538461538461537, "late_pickup_rate": 13.384615384615383, "avg_delivery_minutes": 31.216435897435886, "avg_courier_delivery_min": 26.937416538264003}], "replacement_adjustment": [{"period": "2026-05", "adjustment_rate": 3.55, "replacement_rate": 0.0}, {"period": "2026-06", "adjustment_rate": 7.99, "replacement_rate": 0.0}, {"period": "2026-07", "adjustment_rate": 5.12, "replacement_rate": 0.0}, {"period": "2026-08", "adjustment_rate": 0.86, "replacement_rate": 0.0}], "failed_orders": [{"period": "2026-05", "total_placed": 141.0, "delivered": 92.0, "failed_total": 49.0, "failed_rate_pct": 34.751773049645394}, {"period": "2026-06", "total_placed": 702.0, "delivered": 512.0, "failed_total": 190.0, "failed_rate_pct": 27.065527065527068}, {"period": "2026-07", "total_placed": 701.0, "delivered": 601.0, "failed_total": 100.0, "failed_rate_pct": 14.265335235378032}, {"period": "2026-08", "total_placed": 714.0, "delivered": 650.0, "failed_total": 64.0, "failed_rate_pct": 8.96358543417367}], "failed_reasons": [{"period": "2026-05", "reason": "manually_failed_by_cs", "actor_type": "provider", "cnt": 41.0}, {"period": "2026-05", "reason": "manually_failed_by_user", "actor_type": "client", "cnt": 5.0}, {"period": "2026-05", "reason": "manually_failed_by_cs", "actor_type": "bolt", "cnt": 2.0}, {"period": "2026-05", "reason": "manually_failed_by_cs", "actor_type": "courier", "cnt": 1.0}, {"period": "2026-06", "reason": "manually_failed_by_cs", "actor_type": "provider", "cnt": 149.0}, {"period": "2026-06", "reason": "did_not_respond", "actor_type": "provider", "cnt": 17.0}, {"period": "2026-06", "reason": "manually_failed_by_user", "actor_type": "client", "cnt": 16.0}, {"period": "2026-06", "reason": "manually_failed_by_cs", "actor_type": "courier", "cnt": 4.0}, {"period": "2026-06", "reason": "manually_failed_by_cs", "actor_type": "bolt", "cnt": 3.0}, {"period": "2026-06", "reason": "automatically_failed", "actor_type": "bolt", "cnt": 1.0}, {"period": "2026-07", "reason": "manually_failed_by_cs", "actor_type": "provider", "cnt": 77.0}, {"period": "2026-07", "reason": "manually_failed_by_user", "actor_type": "client", "cnt": 13.0}, {"period": "2026-07", "reason": "did_not_respond", "actor_type": "provider", "cnt": 6.0}, {"period": "2026-07", "reason": "manually_failed_by_cs", "actor_type": "bolt", "cnt": 2.0}, {"period": "2026-07", "reason": "manually_failed_by_cs", "actor_type": "courier", "cnt": 2.0}, {"period": "2026-08", "reason": "manually_failed_by_cs", "actor_type": "provider", "cnt": 49.0}, {"period": "2026-08", "reason": "manually_failed_by_user", "actor_type": "client", "cnt": 7.0}, {"period": "2026-08", "reason": "did_not_respond", "actor_type": "provider", "cnt": 4.0}, {"period": "2026-08", "reason": "manually_failed_by_cs", "actor_type": "courier", "cnt": 2.0}, {"period": "2026-08", "reason": "manually_failed_by_cs", "actor_type": "bolt", "cnt": 2.0}], "campaigns": [{"period": "2026-05", "campaigns_discount_uah": 9278.0, "item_discount_uah": 4639.0, "delivery_discount_uah": 4639.0, "merchant_spend_eur": 0.0, "campaign_orders": 65.0}, {"period": "2026-06", "campaigns_discount_uah": 59676.31, "item_discount_uah": 30100.81, "delivery_discount_uah": 29575.5, "merchant_spend_eur": 0.0, "campaign_orders": 482.0}, {"period": "2026-07", "campaigns_discount_uah": 52376.33, "item_discount_uah": 26824.33, "delivery_discount_uah": 25552.0, "merchant_spend_eur": 0.0, "campaign_orders": 544.0}, {"period": "2026-08", "campaigns_discount_uah": 43003.09, "item_discount_uah": 22735.69, "delivery_discount_uah": 20267.4, "merchant_spend_eur": 0.0, "campaign_orders": 510.0}], "acceptance_availability": [{"period": "2026-05", "acceptance_rate": 96.5, "availability_rate": 90.9, "avg_rating": 4.889}, {"period": "2026-06", "acceptance_rate": 95.7, "availability_rate": 62.5, "avg_rating": 4.772}, {"period": "2026-07", "acceptance_rate": 97.1, "availability_rate": 92.1, "avg_rating": 4.821}, {"period": "2026-08", "acceptance_rate": 98.7, "availability_rate": 93.2, "avg_rating": 4.858}]}, "weekly": {"financial": [{"period": "2026-08-24", "orders": 146.0, "merchant_price_uah": 68406.88, "merchant_price_per_order": 468.54027397260273, "gmv_uah": 81989.08, "aov_uah": 561.5690410958904, "users_activated": 7.0, "active_users": 131.0, "refund_rate_pct": 0.8065586166736296, "eur_uah_rate": 51.97225149029081}, {"period": "2026-08-31", "orders": 167.0, "merchant_price_uah": 81715.24, "merchant_price_per_order": 489.3128143712575, "gmv_uah": 96754.44, "aov_uah": 579.3679041916167, "users_activated": 4.0, "active_users": 151.0, "refund_rate_pct": 0.09285361616261809, "eur_uah_rate": 51.805551453173386}, {"period": "2026-09-07", "orders": 150.0, "merchant_price_uah": 83915.5, "merchant_price_per_order": 559.4366666666666, "gmv_uah": 98480.7, "aov_uah": 656.538, "users_activated": 7.0, "active_users": 133.0, "refund_rate_pct": 0.5641714321546633, "eur_uah_rate": 51.77222253149026}, {"period": "2026-09-14", "orders": 140.0, "merchant_price_uah": 69723.98, "merchant_price_per_order": 498.02842857142855, "gmv_uah": 83098.58, "aov_uah": 593.5612857142858, "users_activated": 9.0, "active_users": 134.0, "refund_rate_pct": 0.12274577977144736, "eur_uah_rate": 51.409998060385135}], "operational": [{"period": "2026-08-24", "delivered_orders": 146.0, "active_stores": 42.0, "honey_order_rate": 53.42465753424658, "bad_order_rate": 8.21917808219178, "late_delivery_rate": 30.136986301369863, "late_pickup_rate": 18.493150684931507, "avg_delivery_minutes": 30.46335616438355, "avg_courier_delivery_min": 28.274086757990858}, {"period": "2026-08-31", "delivered_orders": 167.0, "active_stores": 41.0, "honey_order_rate": 50.29940119760479, "bad_order_rate": 5.9880239520958085, "late_delivery_rate": 28.74251497005988, "late_pickup_rate": 12.574850299401197, "avg_delivery_minutes": 37.50798403193614, "avg_courier_delivery_min": 28.290361445783127}, {"period": "2026-09-07", "delivered_orders": 150.0, "active_stores": 41.0, "honey_order_rate": 44.0, "bad_order_rate": 7.333333333333333, "late_delivery_rate": 26.666666666666668, "late_pickup_rate": 18.666666666666668, "avg_delivery_minutes": 31.593555555555557, "avg_courier_delivery_min": 29.35866666666666}, {"period": "2026-09-14", "delivered_orders": 140.0, "active_stores": 39.0, "honey_order_rate": 54.285714285714285, "bad_order_rate": 8.571428571428571, "late_delivery_rate": 27.857142857142858, "late_pickup_rate": 10.714285714285714, "avg_delivery_minutes": 36.441904761904766, "avg_courier_delivery_min": 26.23956834532375}], "replacement_adjustment": [{"period": "2026-08-24", "adjustment_rate": 1.23, "replacement_rate": 0.0}, {"period": "2026-08-31", "adjustment_rate": 0.53, "replacement_rate": 0.0}, {"period": "2026-09-07", "adjustment_rate": 0.0, "replacement_rate": null}, {"period": "2026-09-14", "adjustment_rate": 0.66, "replacement_rate": 0.0}], "failed_orders": [{"period": "2026-08-24", "total_placed": 164.0, "delivered": 146.0, "failed_total": 18.0, "failed_rate_pct": 10.975609756097562}, {"period": "2026-08-31", "total_placed": 189.0, "delivered": 167.0, "failed_total": 22.0, "failed_rate_pct": 11.64021164021164}, {"period": "2026-09-07", "total_placed": 169.0, "delivered": 150.0, "failed_total": 19.0, "failed_rate_pct": 11.242603550295858}, {"period": "2026-09-14", "total_placed": 152.0, "delivered": 140.0, "failed_total": 12.0, "failed_rate_pct": 7.894736842105263}], "failed_reasons": [{"period": "2026-08-24", "reason": "manually_failed_by_cs", "actor_type": "provider", "cnt": 15.0}, {"period": "2026-08-24", "reason": "did_not_respond", "actor_type": "provider", "cnt": 1.0}, {"period": "2026-08-24", "reason": "manually_failed_by_cs", "actor_type": "bolt", "cnt": 1.0}, {"period": "2026-08-24", "reason": "manually_failed_by_user", "actor_type": "client", "cnt": 1.0}, {"period": "2026-08-31", "reason": "manually_failed_by_cs", "actor_type": "provider", "cnt": 19.0}, {"period": "2026-08-31", "reason": "manually_failed_by_cs", "actor_type": "courier", "cnt": 1.0}, {"period": "2026-08-31", "reason": "manually_failed_by_user", "actor_type": "client", "cnt": 1.0}, {"period": "2026-08-31", "reason": "manually_failed_by_cs", "actor_type": "bolt", "cnt": 1.0}, {"period": "2026-09-07", "reason": "manually_failed_by_cs", "actor_type": "provider", "cnt": 15.0}, {"period": "2026-09-07", "reason": "manually_failed_by_user", "actor_type": "client", "cnt": 3.0}, {"period": "2026-09-07", "reason": "manually_failed_by_cs", "actor_type": "courier", "cnt": 1.0}, {"period": "2026-09-14", "reason": "manually_failed_by_cs", "actor_type": "provider", "cnt": 7.0}, {"period": "2026-09-14", "reason": "manually_failed_by_cs", "actor_type": "bolt", "cnt": 3.0}, {"period": "2026-09-14", "reason": "manually_failed_by_user", "actor_type": "client", "cnt": 1.0}, {"period": "2026-09-14", "reason": "did_not_respond", "actor_type": "provider", "cnt": 1.0}], "campaigns": [{"period": "2026-08-24", "campaigns_discount_uah": 7517.6, "item_discount_uah": 3758.8, "delivery_discount_uah": 3758.8, "merchant_spend_eur": 0.0, "campaign_orders": 96.0}, {"period": "2026-08-31", "campaigns_discount_uah": 5101.64, "item_discount_uah": 2804.54, "delivery_discount_uah": 2297.1, "merchant_spend_eur": 0.0, "campaign_orders": 67.0}, {"period": "2026-09-07", "campaigns_discount_uah": 6050.49, "item_discount_uah": 3604.29, "delivery_discount_uah": 2446.2, "merchant_spend_eur": 0.0, "campaign_orders": 61.0}, {"period": "2026-09-14", "campaigns_discount_uah": 5156.44, "item_discount_uah": 2902.24, "delivery_discount_uah": 2254.2, "merchant_spend_eur": 0.0, "campaign_orders": 59.0}], "acceptance_availability": [{"period": "2026-08-24", "acceptance_rate": 98.8, "availability_rate": 92.6, "avg_rating": 4.619}, {"period": "2026-08-31", "acceptance_rate": 99.5, "availability_rate": 91.4, "avg_rating": 5.0}, {"period": "2026-09-07", "acceptance_rate": 98.2, "availability_rate": 89.7, "avg_rating": 4.763}, {"period": "2026-09-14", "acceptance_rate": 98.7, "availability_rate": 89.4, "avg_rating": 4.9}]}, "acceptance_current": [{"acceptance_rate": 100.0, "availability_rate": 92.7, "avg_rating": 4.778}], "top_stores": [{"provider_name": "ANRI-PHARM, вул. Басейна, 23/52, прим. 31,32", "city_name": "Kyiv", "orders": 54.0, "merchant_price_uah": 33571.11}, {"provider_name": "ANRI-PHARM, вул.Золотоустівська 25, ЖК Шевченківський", "city_name": "Kyiv", "orders": 45.0, "merchant_price_uah": 25831.97}, {"provider_name": "ANRI-PHARM, вул. Тютюнника Василя (вул. Барбюса Анрі), 56", "city_name": "Kyiv", "orders": 44.0, "merchant_price_uah": 17113.22}, {"provider_name": "ANRI-PHARM, вул. Щербаківського, буд. 52", "city_name": "Kyiv", "orders": 39.0, "merchant_price_uah": 16609.76}, {"provider_name": "ANRI-PHARM, Шевченка, 38", "city_name": "Lviv", "orders": 37.0, "merchant_price_uah": 15812.25}, {"provider_name": "ANRI-PHARM, вул. Кудряшова(Мокра), 20, ЖК \"Пори року\"", "city_name": "Kyiv", "orders": 32.0, "merchant_price_uah": 12104.11}, {"provider_name": "м. Львів, Липинського В., 36 (в приміщенні АТБ)", "city_name": "Lviv", "orders": 27.0, "merchant_price_uah": 11718.83}, {"provider_name": "ANRI-PHARM, вул Франка,39", "city_name": "Lviv", "orders": 28.0, "merchant_price_uah": 11106.3}, {"provider_name": "ANRI-PHARM, вул.І.Франка, 13", "city_name": "Lviv", "orders": 16.0, "merchant_price_uah": 8302.02}, {"provider_name": "ANRI-PHARM, Кульпарківська, 230А корп3, прим 1б (ЖК ФАМІЛІЯ)", "city_name": "Lviv", "orders": 21.0, "merchant_price_uah": 6960.98}, {"provider_name": "ANRI-PHARM, вул.О.Пчілки, 2а", "city_name": "Kyiv", "orders": 15.0, "merchant_price_uah": 6708.87}, {"provider_name": "ANRI-PHARM, вул.Богдана Хмельницького, 66", "city_name": "Kyiv", "orders": 16.0, "merchant_price_uah": 6453.31}, {"provider_name": "ANRI-PHARM, вул.Сім'ї Кульженків, 37 (ЖК Яскравий)", "city_name": "Kyiv", "orders": 9.0, "merchant_price_uah": 6415.22}, {"provider_name": "ANRI-PHARM, вул. Маккейна Джона, 1", "city_name": "Kyiv", "orders": 9.0, "merchant_price_uah": 6198.09}, {"provider_name": "ANRI-PHARM, с. Крюківщина, вул. Жулянська, 2а, ЖК\"Євромісто\"", "city_name": "Kyiv", "orders": 10.0, "merchant_price_uah": 5764.36}], "network": {"summary": {"stores_in_base": 85.0, "stores_ever_active": 59.0, "active_30d": 53.0, "first_order_date": "2026-05-20"}, "activation": [{"period": "2026-05", "active_stores": 26.0, "new_stores": 26.0, "orders": 92.0}, {"period": "2026-06", "active_stores": 43.0, "new_stores": 18.0, "orders": 512.0}, {"period": "2026-07", "active_stores": 53.0, "new_stores": 13.0, "orders": 601.0}, {"period": "2026-08", "active_stores": 54.0, "new_stores": 2.0, "orders": 650.0}]}, "store_activity": [{"week": "2026-08-24", "provider_id": 203420.0, "provider_name": "ANRI-PHARM, Володимира Івасюка 6", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203420.0, "provider_name": "ANRI-PHARM, Володимира Івасюка 6", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203420.0, "provider_name": "ANRI-PHARM, Володимира Івасюка 6", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203420.0, "provider_name": "ANRI-PHARM, Володимира Івасюка 6", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 892722.0, "provider_name": "ANRI-PHARM, Воскресенська 16", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 892722.0, "provider_name": "ANRI-PHARM, Воскресенська 16", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 892722.0, "provider_name": "ANRI-PHARM, Воскресенська 16", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 892722.0, "provider_name": "ANRI-PHARM, Воскресенська 16", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203448.0, "provider_name": "ANRI-PHARM, Драгомирова 19-А, Липки-4 (Андрія Верхогляда)", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203448.0, "provider_name": "ANRI-PHARM, Драгомирова 19-А, Липки-4 (Андрія Верхогляда)", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203448.0, "provider_name": "ANRI-PHARM, Драгомирова 19-А, Липки-4 (Андрія Верхогляда)", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203448.0, "provider_name": "ANRI-PHARM, Драгомирова 19-А, Липки-4 (Андрія Верхогляда)", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 442714.0, "provider_name": "ANRI-PHARM, Замарстинівська, 170Л", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 442714.0, "provider_name": "ANRI-PHARM, Замарстинівська, 170Л", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 442714.0, "provider_name": "ANRI-PHARM, Замарстинівська, 170Л", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 442714.0, "provider_name": "ANRI-PHARM, Замарстинівська, 170Л", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203459.0, "provider_name": "ANRI-PHARM, Кульпарківська, 230А корп3, прим 1б (ЖК ФАМІЛІЯ)", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203459.0, "provider_name": "ANRI-PHARM, Кульпарківська, 230А корп3, прим 1б (ЖК ФАМІЛІЯ)", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203459.0, "provider_name": "ANRI-PHARM, Кульпарківська, 230А корп3, прим 1б (ЖК ФАМІЛІЯ)", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203459.0, "provider_name": "ANRI-PHARM, Кульпарківська, 230А корп3, прим 1б (ЖК ФАМІЛІЯ)", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203397.0, "provider_name": "ANRI-PHARM, Оболонський пр-т, 35", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203397.0, "provider_name": "ANRI-PHARM, Оболонський пр-т, 35", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203397.0, "provider_name": "ANRI-PHARM, Оболонський пр-т, 35", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203397.0, "provider_name": "ANRI-PHARM, Оболонський пр-т, 35", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203400.0, "provider_name": "ANRI-PHARM, Степана Рудницького 19/14", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203400.0, "provider_name": "ANRI-PHARM, Степана Рудницького 19/14", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203400.0, "provider_name": "ANRI-PHARM, Степана Рудницького 19/14", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203400.0, "provider_name": "ANRI-PHARM, Степана Рудницького 19/14", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 16.7}, {"week": "2026-08-24", "provider_id": 203392.0, "provider_name": "ANRI-PHARM, Харківске шосе, 19 ТЦ \"Мегасіті\"", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203392.0, "provider_name": "ANRI-PHARM, Харківске шосе, 19 ТЦ \"Мегасіті\"", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203392.0, "provider_name": "ANRI-PHARM, Харківске шосе, 19 ТЦ \"Мегасіті\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203392.0, "provider_name": "ANRI-PHARM, Харківске шосе, 19 ТЦ \"Мегасіті\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 862732.0, "provider_name": "ANRI-PHARM, Шевченка, 38", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 862732.0, "provider_name": "ANRI-PHARM, Шевченка, 38", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 862732.0, "provider_name": "ANRI-PHARM, Шевченка, 38", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 862732.0, "provider_name": "ANRI-PHARM, Шевченка, 38", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203434.0, "provider_name": "ANRI-PHARM, б-р Рильського Тадея, 5 прим.503-2", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203434.0, "provider_name": "ANRI-PHARM, б-р Рильського Тадея, 5 прим.503-2", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203434.0, "provider_name": "ANRI-PHARM, б-р Рильського Тадея, 5 прим.503-2", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203434.0, "provider_name": "ANRI-PHARM, б-р Рильського Тадея, 5 прим.503-2", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 772725.0, "provider_name": "ANRI-PHARM, бульвар Тараса Шевченко , буд. 9", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 772725.0, "provider_name": "ANRI-PHARM, бульвар Тараса Шевченко , буд. 9", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 772725.0, "provider_name": "ANRI-PHARM, бульвар Тараса Шевченко , буд. 9", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 772725.0, "provider_name": "ANRI-PHARM, бульвар Тараса Шевченко , буд. 9", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203450.0, "provider_name": "ANRI-PHARM, вул Антоновича, 93", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203450.0, "provider_name": "ANRI-PHARM, вул Антоновича, 93", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203450.0, "provider_name": "ANRI-PHARM, вул Антоновича, 93", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203450.0, "provider_name": "ANRI-PHARM, вул Антоновича, 93", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 472709.0, "provider_name": "ANRI-PHARM, вул Франка,39", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 472709.0, "provider_name": "ANRI-PHARM, вул Франка,39", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 472709.0, "provider_name": "ANRI-PHARM, вул Франка,39", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 472709.0, "provider_name": "ANRI-PHARM, вул Франка,39", "city_name": "Lviv", "acceptance_rate": 75.0, "availability_rate": 22.1}, {"week": "2026-08-24", "provider_id": 203424.0, "provider_name": "ANRI-PHARM, вул. Іоанна Павла, 20", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": null}, {"week": "2026-08-31", "provider_id": 203424.0, "provider_name": "ANRI-PHARM, вул. Іоанна Павла, 20", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": null}, {"week": "2026-09-07", "provider_id": 203424.0, "provider_name": "ANRI-PHARM, вул. Іоанна Павла, 20", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": null}, {"week": "2026-09-14", "provider_id": 203424.0, "provider_name": "ANRI-PHARM, вул. Іоанна Павла, 20", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": null}, {"week": "2026-08-24", "provider_id": 203440.0, "provider_name": "ANRI-PHARM, вул. Артема,(Січових стрільців), 55", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203440.0, "provider_name": "ANRI-PHARM, вул. Артема,(Січових стрільців), 55", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203440.0, "provider_name": "ANRI-PHARM, вул. Артема,(Січових стрільців), 55", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203440.0, "provider_name": "ANRI-PHARM, вул. Артема,(Січових стрільців), 55", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203415.0, "provider_name": "ANRI-PHARM, вул. Бажана, 1Е ТЦ \"Апетит\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203415.0, "provider_name": "ANRI-PHARM, вул. Бажана, 1Е ТЦ \"Апетит\"", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203415.0, "provider_name": "ANRI-PHARM, вул. Бажана, 1Е ТЦ \"Апетит\"", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203415.0, "provider_name": "ANRI-PHARM, вул. Бажана, 1Е ТЦ \"Апетит\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203421.0, "provider_name": "ANRI-PHARM, вул. Басейна, 23/52, прим. 31,32", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203421.0, "provider_name": "ANRI-PHARM, вул. Басейна, 23/52, прим. 31,32", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203421.0, "provider_name": "ANRI-PHARM, вул. Басейна, 23/52, прим. 31,32", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203421.0, "provider_name": "ANRI-PHARM, вул. Басейна, 23/52, прим. 31,32", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203444.0, "provider_name": "ANRI-PHARM, вул. Богданівська, 7-Д", "city_name": "Kyiv", "acceptance_rate": 0.0, "availability_rate": 1.5}, {"week": "2026-08-31", "provider_id": 203444.0, "provider_name": "ANRI-PHARM, вул. Богданівська, 7-Д", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 0.0}, {"week": "2026-09-07", "provider_id": 203444.0, "provider_name": "ANRI-PHARM, вул. Богданівська, 7-Д", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 0.0}, {"week": "2026-09-14", "provider_id": 203444.0, "provider_name": "ANRI-PHARM, вул. Богданівська, 7-Д", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 0.0}, {"week": "2026-08-24", "provider_id": 472722.0, "provider_name": "ANRI-PHARM, вул. Богданівська, 7Д", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 472722.0, "provider_name": "ANRI-PHARM, вул. Богданівська, 7Д", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 472722.0, "provider_name": "ANRI-PHARM, вул. Богданівська, 7Д", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 472722.0, "provider_name": "ANRI-PHARM, вул. Богданівська, 7Д", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 742738.0, "provider_name": "ANRI-PHARM, вул. В. Чорновола 26/2А", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 742738.0, "provider_name": "ANRI-PHARM, вул. В. Чорновола 26/2А", "city_name": "Kyiv", "acceptance_rate": 87.5, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 742738.0, "provider_name": "ANRI-PHARM, вул. В. Чорновола 26/2А", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 742738.0, "provider_name": "ANRI-PHARM, вул. В. Чорновола 26/2А", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203411.0, "provider_name": "ANRI-PHARM, вул. Гмирі, 18", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203411.0, "provider_name": "ANRI-PHARM, вул. Гмирі, 18", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203411.0, "provider_name": "ANRI-PHARM, вул. Гмирі, 18", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203411.0, "provider_name": "ANRI-PHARM, вул. Гмирі, 18", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203398.0, "provider_name": "ANRI-PHARM, вул. Драгомирова 14а", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 0.0}, {"week": "2026-08-31", "provider_id": 203398.0, "provider_name": "ANRI-PHARM, вул. Драгомирова 14а", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 0.0}, {"week": "2026-09-07", "provider_id": 203398.0, "provider_name": "ANRI-PHARM, вул. Драгомирова 14а", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 0.0}, {"week": "2026-09-14", "provider_id": 203398.0, "provider_name": "ANRI-PHARM, вул. Драгомирова 14а", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 0.0}, {"week": "2026-08-24", "provider_id": 622759.0, "provider_name": "ANRI-PHARM, вул. Жилянська, 59", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 622759.0, "provider_name": "ANRI-PHARM, вул. Жилянська, 59", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 622759.0, "provider_name": "ANRI-PHARM, вул. Жилянська, 59", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 622759.0, "provider_name": "ANRI-PHARM, вул. Жилянська, 59", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203393.0, "provider_name": "ANRI-PHARM, вул. Закревського, 95В", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203393.0, "provider_name": "ANRI-PHARM, вул. Закревського, 95В", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203393.0, "provider_name": "ANRI-PHARM, вул. Закревського, 95В", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203393.0, "provider_name": "ANRI-PHARM, вул. Закревського, 95В", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203416.0, "provider_name": "ANRI-PHARM, вул. Зарічна, 1Б", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203416.0, "provider_name": "ANRI-PHARM, вул. Зарічна, 1Б", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203416.0, "provider_name": "ANRI-PHARM, вул. Зарічна, 1Б", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203416.0, "provider_name": "ANRI-PHARM, вул. Зарічна, 1Б", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203394.0, "provider_name": "ANRI-PHARM, вул. Золотоустівська, 50", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203394.0, "provider_name": "ANRI-PHARM, вул. Золотоустівська, 50", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203394.0, "provider_name": "ANRI-PHARM, вул. Золотоустівська, 50", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203394.0, "provider_name": "ANRI-PHARM, вул. Золотоустівська, 50", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203395.0, "provider_name": "ANRI-PHARM, вул. Кудряшова(Мокра), 20, ЖК \"Пори року\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203395.0, "provider_name": "ANRI-PHARM, вул. Кудряшова(Мокра), 20, ЖК \"Пори року\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203395.0, "provider_name": "ANRI-PHARM, вул. Кудряшова(Мокра), 20, ЖК \"Пори року\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203395.0, "provider_name": "ANRI-PHARM, вул. Кудряшова(Мокра), 20, ЖК \"Пори року\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 562711.0, "provider_name": "ANRI-PHARM, вул. Маккейна Джона, 1", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 562711.0, "provider_name": "ANRI-PHARM, вул. Маккейна Джона, 1", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 562711.0, "provider_name": "ANRI-PHARM, вул. Маккейна Джона, 1", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 562711.0, "provider_name": "ANRI-PHARM, вул. Маккейна Джона, 1", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203449.0, "provider_name": "ANRI-PHARM, вул. Максимовича Михайла,24-Б, прим. 71 н", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203449.0, "provider_name": "ANRI-PHARM, вул. Максимовича Михайла,24-Б, прим. 71 н", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203449.0, "provider_name": "ANRI-PHARM, вул. Максимовича Михайла,24-Б, прим. 71 н", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203449.0, "provider_name": "ANRI-PHARM, вул. Максимовича Михайла,24-Б, прим. 71 н", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 682721.0, "provider_name": "ANRI-PHARM, вул. Малоголосківська, буд. 40a", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 682721.0, "provider_name": "ANRI-PHARM, вул. Малоголосківська, буд. 40a", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 682721.0, "provider_name": "ANRI-PHARM, вул. Малоголосківська, буд. 40a", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 682721.0, "provider_name": "ANRI-PHARM, вул. Малоголосківська, буд. 40a", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203413.0, "provider_name": "ANRI-PHARM, вул. Метрологічна, 14Б", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203413.0, "provider_name": "ANRI-PHARM, вул. Метрологічна, 14Б", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203413.0, "provider_name": "ANRI-PHARM, вул. Метрологічна, 14Б", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203413.0, "provider_name": "ANRI-PHARM, вул. Метрологічна, 14Б", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203438.0, "provider_name": "ANRI-PHARM, вул. Метрологічна,19 (НОВУС)", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203438.0, "provider_name": "ANRI-PHARM, вул. Метрологічна,19 (НОВУС)", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203438.0, "provider_name": "ANRI-PHARM, вул. Метрологічна,19 (НОВУС)", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203438.0, "provider_name": "ANRI-PHARM, вул. Метрологічна,19 (НОВУС)", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203453.0, "provider_name": "ANRI-PHARM, вул. Польова,73 Караваєві дачі", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203453.0, "provider_name": "ANRI-PHARM, вул. Польова,73 Караваєві дачі", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203453.0, "provider_name": "ANRI-PHARM, вул. Польова,73 Караваєві дачі", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203453.0, "provider_name": "ANRI-PHARM, вул. Польова,73 Караваєві дачі", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203408.0, "provider_name": "ANRI-PHARM, вул. Регенераторна, 4 крп. 11, ЖК \"КомфортТаун\" КТ 2", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203408.0, "provider_name": "ANRI-PHARM, вул. Регенераторна, 4 крп. 11, ЖК \"КомфортТаун\" КТ 2", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203408.0, "provider_name": "ANRI-PHARM, вул. Регенераторна, 4 крп. 11, ЖК \"КомфортТаун\" КТ 2", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203408.0, "provider_name": "ANRI-PHARM, вул. Регенераторна, 4 крп. 11, ЖК \"КомфортТаун\" КТ 2", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203454.0, "provider_name": "ANRI-PHARM, вул. Руданського Степана,4-6 (Аптека Америка)", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203454.0, "provider_name": "ANRI-PHARM, вул. Руданського Степана,4-6 (Аптека Америка)", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203454.0, "provider_name": "ANRI-PHARM, вул. Руданського Степана,4-6 (Аптека Америка)", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203454.0, "provider_name": "ANRI-PHARM, вул. Руданського Степана,4-6 (Аптека Америка)", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203426.0, "provider_name": "ANRI-PHARM, вул. Тютюнника Василя (вул. Барбюса Анрі), 56", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203426.0, "provider_name": "ANRI-PHARM, вул. Тютюнника Василя (вул. Барбюса Анрі), 56", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203426.0, "provider_name": "ANRI-PHARM, вул. Тютюнника Василя (вул. Барбюса Анрі), 56", "city_name": "Kyiv", "acceptance_rate": 81.8, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203426.0, "provider_name": "ANRI-PHARM, вул. Тютюнника Василя (вул. Барбюса Анрі), 56", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203432.0, "provider_name": "ANRI-PHARM, вул. Щербаківського, буд. 52", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203432.0, "provider_name": "ANRI-PHARM, вул. Щербаківського, буд. 52", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203432.0, "provider_name": "ANRI-PHARM, вул. Щербаківського, буд. 52", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203432.0, "provider_name": "ANRI-PHARM, вул. Щербаківського, буд. 52", "city_name": "Kyiv", "acceptance_rate": 90.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 562705.0, "provider_name": "ANRI-PHARM, вул.І.Франка, 13", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 562705.0, "provider_name": "ANRI-PHARM, вул.І.Франка, 13", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 562705.0, "provider_name": "ANRI-PHARM, вул.І.Франка, 13", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 562705.0, "provider_name": "ANRI-PHARM, вул.І.Франка, 13", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203402.0, "provider_name": "ANRI-PHARM, вул.Андрія Верхогляда 14", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203402.0, "provider_name": "ANRI-PHARM, вул.Андрія Верхогляда 14", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203402.0, "provider_name": "ANRI-PHARM, вул.Андрія Верхогляда 14", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203402.0, "provider_name": "ANRI-PHARM, вул.Андрія Верхогляда 14", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203447.0, "provider_name": "ANRI-PHARM, вул.Березнева 12, \"КТ-3\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203447.0, "provider_name": "ANRI-PHARM, вул.Березнева 12, \"КТ-3\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203447.0, "provider_name": "ANRI-PHARM, вул.Березнева 12, \"КТ-3\"", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203447.0, "provider_name": "ANRI-PHARM, вул.Березнева 12, \"КТ-3\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203431.0, "provider_name": "ANRI-PHARM, вул.Богдана Хмельницького, 66", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203431.0, "provider_name": "ANRI-PHARM, вул.Богдана Хмельницького, 66", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203431.0, "provider_name": "ANRI-PHARM, вул.Богдана Хмельницького, 66", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203431.0, "provider_name": "ANRI-PHARM, вул.Богдана Хмельницького, 66", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203463.0, "provider_name": "ANRI-PHARM, вул.Гмирі Бориса 14-А,прим 217", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203463.0, "provider_name": "ANRI-PHARM, вул.Гмирі Бориса 14-А,прим 217", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203463.0, "provider_name": "ANRI-PHARM, вул.Гмирі Бориса 14-А,прим 217", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 3.3}, {"week": "2026-09-14", "provider_id": 203463.0, "provider_name": "ANRI-PHARM, вул.Гмирі Бориса 14-А,прим 217", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 0.0}, {"week": "2026-08-24", "provider_id": 203404.0, "provider_name": "ANRI-PHARM, вул.Ернста, 16Б", "city_name": "Kyiv", "acceptance_rate": 66.7, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203404.0, "provider_name": "ANRI-PHARM, вул.Ернста, 16Б", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203404.0, "provider_name": "ANRI-PHARM, вул.Ернста, 16Б", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203404.0, "provider_name": "ANRI-PHARM, вул.Ернста, 16Б", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203396.0, "provider_name": "ANRI-PHARM, вул.Золотоустівська 25, ЖК Шевченківський", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203396.0, "provider_name": "ANRI-PHARM, вул.Золотоустівська 25, ЖК Шевченківський", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203396.0, "provider_name": "ANRI-PHARM, вул.Золотоустівська 25, ЖК Шевченківський", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203396.0, "provider_name": "ANRI-PHARM, вул.Золотоустівська 25, ЖК Шевченківський", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203406.0, "provider_name": "ANRI-PHARM, вул.Левка Лук'яненка 29", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": null}, {"week": "2026-08-31", "provider_id": 203406.0, "provider_name": "ANRI-PHARM, вул.Левка Лук'яненка 29", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": null}, {"week": "2026-09-07", "provider_id": 203406.0, "provider_name": "ANRI-PHARM, вул.Левка Лук'яненка 29", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": null}, {"week": "2026-09-14", "provider_id": 203406.0, "provider_name": "ANRI-PHARM, вул.Левка Лук'яненка 29", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": null}, {"week": "2026-08-24", "provider_id": 203419.0, "provider_name": "ANRI-PHARM, вул.О.Пчілки, 2а", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203419.0, "provider_name": "ANRI-PHARM, вул.О.Пчілки, 2а", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203419.0, "provider_name": "ANRI-PHARM, вул.О.Пчілки, 2а", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203419.0, "provider_name": "ANRI-PHARM, вул.О.Пчілки, 2а", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203425.0, "provider_name": "ANRI-PHARM, вул.Панельна, 6 (Аболмасова Андрія)", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203425.0, "provider_name": "ANRI-PHARM, вул.Панельна, 6 (Аболмасова Андрія)", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203425.0, "provider_name": "ANRI-PHARM, вул.Панельна, 6 (Аболмасова Андрія)", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203425.0, "provider_name": "ANRI-PHARM, вул.Панельна, 6 (Аболмасова Андрія)", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203423.0, "provider_name": "ANRI-PHARM, вул.Сім'ї Кульженків, 37 (ЖК Яскравий)", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203423.0, "provider_name": "ANRI-PHARM, вул.Сім'ї Кульженків, 37 (ЖК Яскравий)", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203423.0, "provider_name": "ANRI-PHARM, вул.Сім'ї Кульженків, 37 (ЖК Яскравий)", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203423.0, "provider_name": "ANRI-PHARM, вул.Сім'ї Кульженків, 37 (ЖК Яскравий)", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203446.0, "provider_name": "ANRI-PHARM, вул.Теремківська, буд. 4-А (ЖК Республіка)", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203446.0, "provider_name": "ANRI-PHARM, вул.Теремківська, буд. 4-А (ЖК Республіка)", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203446.0, "provider_name": "ANRI-PHARM, вул.Теремківська, буд. 4-А (ЖК Республіка)", "city_name": "Kyiv", "acceptance_rate": 0.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203446.0, "provider_name": "ANRI-PHARM, вул.Теремківська, буд. 4-А (ЖК Республіка)", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203435.0, "provider_name": "ANRI-PHARM, м. Ірпінь, вул. Університетська, 2ф/2, ЖК Карат", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203435.0, "provider_name": "ANRI-PHARM, м. Ірпінь, вул. Університетська, 2ф/2, ЖК Карат", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203435.0, "provider_name": "ANRI-PHARM, м. Ірпінь, вул. Університетська, 2ф/2, ЖК Карат", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203435.0, "provider_name": "ANRI-PHARM, м. Ірпінь, вул. Університетська, 2ф/2, ЖК Карат", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203410.0, "provider_name": "ANRI-PHARM, м. Бровари, вул. Чорновола, 6А", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203410.0, "provider_name": "ANRI-PHARM, м. Бровари, вул. Чорновола, 6А", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203410.0, "provider_name": "ANRI-PHARM, м. Бровари, вул. Чорновола, 6А", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203410.0, "provider_name": "ANRI-PHARM, м. Бровари, вул. Чорновола, 6А", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 742739.0, "provider_name": "ANRI-PHARM, м. Вишгород, вул. Набережна, 6Г", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 742739.0, "provider_name": "ANRI-PHARM, м. Вишгород, вул. Набережна, 6Г", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 742739.0, "provider_name": "ANRI-PHARM, м. Вишгород, вул. Набережна, 6Г", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 742739.0, "provider_name": "ANRI-PHARM, м. Вишгород, вул. Набережна, 6Г", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203457.0, "provider_name": "ANRI-PHARM, м. Вишгород,Кургузова,1-А,корп.3 (Вышгород-1)", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203457.0, "provider_name": "ANRI-PHARM, м. Вишгород,Кургузова,1-А,корп.3 (Вышгород-1)", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203457.0, "provider_name": "ANRI-PHARM, м. Вишгород,Кургузова,1-А,корп.3 (Вышгород-1)", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203457.0, "provider_name": "ANRI-PHARM, м. Вишгород,Кургузова,1-А,корп.3 (Вышгород-1)", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203433.0, "provider_name": "ANRI-PHARM, провулок Ясинуватський, буд. 10", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203433.0, "provider_name": "ANRI-PHARM, провулок Ясинуватський, буд. 10", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203433.0, "provider_name": "ANRI-PHARM, провулок Ясинуватський, буд. 10", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203433.0, "provider_name": "ANRI-PHARM, провулок Ясинуватський, буд. 10", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203429.0, "provider_name": "ANRI-PHARM, проспект Палладіна Академіка, буд. 22", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203429.0, "provider_name": "ANRI-PHARM, проспект Палладіна Академіка, буд. 22", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203429.0, "provider_name": "ANRI-PHARM, проспект Палладіна Академіка, буд. 22", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203429.0, "provider_name": "ANRI-PHARM, проспект Палладіна Академіка, буд. 22", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 862737.0, "provider_name": "ANRI-PHARM, проспект Повітряних Сил 52", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 862737.0, "provider_name": "ANRI-PHARM, проспект Повітряних Сил 52", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 862737.0, "provider_name": "ANRI-PHARM, проспект Повітряних Сил 52", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 862737.0, "provider_name": "ANRI-PHARM, проспект Повітряних Сил 52", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 802731.0, "provider_name": "ANRI-PHARM, с. Гатне, вул. Одеська, 2", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 802731.0, "provider_name": "ANRI-PHARM, с. Гатне, вул. Одеська, 2", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 25.9}, {"week": "2026-09-07", "provider_id": 802731.0, "provider_name": "ANRI-PHARM, с. Гатне, вул. Одеська, 2", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 0.0}, {"week": "2026-09-14", "provider_id": 802731.0, "provider_name": "ANRI-PHARM, с. Гатне, вул. Одеська, 2", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 0.0}, {"week": "2026-08-24", "provider_id": 203407.0, "provider_name": "ANRI-PHARM, с. Крюківщина, вул. Жулянська, 2а, ЖК\"Євромісто\"", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203407.0, "provider_name": "ANRI-PHARM, с. Крюківщина, вул. Жулянська, 2а, ЖК\"Євромісто\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203407.0, "provider_name": "ANRI-PHARM, с. Крюківщина, вул. Жулянська, 2а, ЖК\"Євромісто\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203407.0, "provider_name": "ANRI-PHARM, с. Крюківщина, вул. Жулянська, 2а, ЖК\"Євромісто\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203428.0, "provider_name": "ANRI-PHARM, с. Крюківщина, вул. Одеська, 22", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203428.0, "provider_name": "ANRI-PHARM, с. Крюківщина, вул. Одеська, 22", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203428.0, "provider_name": "ANRI-PHARM, с. Крюківщина, вул. Одеська, 22", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203428.0, "provider_name": "ANRI-PHARM, с. Крюківщина, вул. Одеська, 22", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203409.0, "provider_name": "ANRI-PHARM, с. Петропавлівська Борщагівка, ЖК \"Щасливий\", вул. Соборна, 10 А", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203409.0, "provider_name": "ANRI-PHARM, с. Петропавлівська Борщагівка, ЖК \"Щасливий\", вул. Соборна, 10 А", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203409.0, "provider_name": "ANRI-PHARM, с. Петропавлівська Борщагівка, ЖК \"Щасливий\", вул. Соборна, 10 А", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203409.0, "provider_name": "ANRI-PHARM, с. Петропавлівська Борщагівка, ЖК \"Щасливий\", вул. Соборна, 10 А", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203418.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, вул. Івана Франка, 6", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203418.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, вул. Івана Франка, 6", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203418.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, вул. Івана Франка, 6", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203418.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, вул. Івана Франка, 6", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203403.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, вул. Сагайдачного, 20а, ТЦ\"Львівський маєток\"", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203403.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, вул. Сагайдачного, 20а, ТЦ\"Львівський маєток\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203403.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, вул. Сагайдачного, 20а, ТЦ\"Львівський маєток\"", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203403.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, вул. Сагайдачного, 20а, ТЦ\"Львівський маєток\"", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203441.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, вул.Щаслива,19/6", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203441.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, вул.Щаслива,19/6", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203441.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, вул.Щаслива,19/6", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203441.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, вул.Щаслива,19/6", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203437.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, пр-т Героїв Небесної Сотні, 24/83", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203437.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, пр-т Героїв Небесної Сотні, 24/83", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203437.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, пр-т Героїв Небесної Сотні, 24/83", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203437.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка, пр-т Героїв Небесної Сотні, 24/83", "city_name": "Kyiv", "acceptance_rate": null, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 203439.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка,вул.Соборна, 118-А", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 203439.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка,вул.Соборна, 118-А", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 203439.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка,вул.Соборна, 118-А", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 203439.0, "provider_name": "ANRI-PHARM, с. Софіївська Борщагівка,вул.Соборна, 118-А", "city_name": "Kyiv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-24", "provider_id": 442715.0, "provider_name": "м. Львів, Липинського В., 36 (в приміщенні АТБ)", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-08-31", "provider_id": 442715.0, "provider_name": "м. Львів, Липинського В., 36 (в приміщенні АТБ)", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-07", "provider_id": 442715.0, "provider_name": "м. Львів, Липинського В., 36 (в приміщенні АТБ)", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}, {"week": "2026-09-14", "provider_id": 442715.0, "provider_name": "м. Львів, Липинського В., 36 (в приміщенні АТБ)", "city_name": "Lviv", "acceptance_rate": 100.0, "availability_rate": 100.0}]};
+
+// ─── Helpers ───
+const n = (v, d=1) => v == null ? '—' : Number(v).toFixed(d);
+const uah = (v) => v == null ? '—' : Number(v).toLocaleString('uk-UA', {minimumFractionDigits:0, maximumFractionDigits:0}) + ' ₴';
+const pct = (v) => v == null ? '—' : n(v,1) + '%';
+const fmt = (v) => v == null ? '—' : Number(v).toLocaleString('uk-UA', {maximumFractionDigits:0});
+const fmtDec = (v, d=2) => v == null ? '—' : Number(v).toLocaleString('uk-UA', {minimumFractionDigits:d, maximumFractionDigits:d});
+
+function shortMonth(period) {
+  const map = {'01':'Січ','02':'Лют','03':'Бер','04':'Кві','05':'Тра','06':'Чер','07':'Лип','08':'Сер','09':'Вер','10':'Жов','11':'Лис','12':'Гру'};
+  const [y,m] = period.split('-');
+  return (map[m]||m) + ' ' + y.slice(2);
+}
+
+function shortWeek(period) {
+  const d = new Date(period + 'T00:00:00');
+  const day = d.getDate().toString().padStart(2,'0');
+  const mon = (d.getMonth()+1).toString().padStart(2,'0');
+  return day + '.' + mon;
+}
+
+function changeBadge(curr, prev, inverse=false) {
+  if (prev == null || curr == null) return '';
+  const diff = curr - prev;
+  const pctChange = prev !== 0 ? (diff / Math.abs(prev) * 100) : 0;
+  const isGood = inverse ? diff < 0 : diff > 0;
+  const cls = Math.abs(diff) < 0.5 ? 'badge-b' : isGood ? 'badge-g' : 'badge-r';
+  const arrow = diff > 0 ? '▲' : diff < 0 ? '▼' : '≈';
+  return `<span class="badge ${cls}">${arrow} ${Math.abs(pctChange).toFixed(1)}%</span>`;
+}
+
+function ppBadge(curr, prev, inverse=false) {
+  if (prev == null || curr == null) return '';
+  const diff = curr - prev;
+  const isGood = inverse ? diff < 0 : diff > 0;
+  const cls = Math.abs(diff) < 0.3 ? 'badge-b' : isGood ? 'badge-g' : 'badge-r';
+  const sign = diff > 0 ? '+' : '';
+  return `<span class="badge ${cls}">${sign}${diff.toFixed(1)}pp</span>`;
+}
+
+const defOpts = {
+  responsive:true, maintainAspectRatio:false,
+  plugins:{legend:{labels:{color:'#6b7280',font:{size:11}}},tooltip:{backgroundColor:'#fff',borderColor:'#e5e7eb',borderWidth:1,titleColor:'#1f2937',bodyColor:'#6b7280'}},
+  scales:{x:{ticks:{color:'#9ca3af',font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'}},y:{ticks:{color:'#9ca3af',font:{size:10}},grid:{color:'rgba(0,0,0,0.06)'}}}
+};
+
+function dualY(l,r){return{...defOpts,scales:{...defOpts.scales,y:{...defOpts.scales.y,title:{display:true,text:l,color:'#9ca3af'}},y1:{...defOpts.scales.y,position:'right',title:{display:true,text:r,color:'#9ca3af'},grid:{drawOnChartArea:false}}}}}
+
+function mergeData(finArr, opsArr, replArr, failArr, aaArr) {
+  const map = {};
+  const addToMap = (arr, prefix) => {
+    if (!arr) return;
+    for (const row of arr) {
+      const p = row.period;
+      if (!map[p]) map[p] = {period: p};
+      for (const [k,v] of Object.entries(row)) {
+        if (k !== 'period') map[p][prefix ? prefix+'_'+k : k] = v;
+      }
+    }
+  };
+  addToMap(finArr, 'fin');
+  addToMap(opsArr, 'ops');
+  addToMap(replArr, 'repl');
+  addToMap(failArr, 'fail');
+  addToMap(aaArr, 'aa');
+  return Object.values(map).sort((a,b) => a.period.localeCompare(b.period));
+}
+
+function buildFailReasonsMap(reasons) {
+  const map = {};
+  for (const r of reasons) {
+    if (!map[r.period]) map[r.period] = {};
+    const key = r.reason + '|' + r.actor_type;
+    map[r.period][key] = (map[r.period][key] || 0) + Number(r.cnt);
+  }
+  return map;
+}
+
+function reasonLabel(reason, actor) {
+  const labels = {
+    'manually_failed_by_cs|provider': 'CS — проблема закладу',
+    'manually_failed_by_cs|bolt': 'CS — проблема Bolt',
+    'manually_failed_by_cs|courier': 'CS — проблема кур\'єра',
+    'did_not_respond|provider': 'Заклад не відповів',
+    'cannot_find_courier|provider': 'Не знайдено кур\'єра',
+    'manually_failed_by_user|client': 'Скасування клієнтом',
+    'automatically_failed|bolt': 'Автоматичне скасування',
+    'closed|provider': 'Заклад зачинений',
+    'do_not_wish_to_serve_this_client|provider': 'Заклад відмовив клієнту',
+    'items_out_of_stock|provider': 'Немає товару в наявності',
+    'other|provider': 'Інше (заклад)',
+  };
+  const reasonsUA = {
+    'manually_failed_by_cs': 'Скасовано через CS',
+    'did_not_respond': 'Заклад не відповів',
+    'cannot_find_courier': 'Не знайдено кур\'єра',
+    'manually_failed_by_user': 'Скасування клієнтом',
+    'automatically_failed': 'Автоматичне скасування',
+    'closed': 'Заклад зачинений',
+    'do_not_wish_to_serve_this_client': 'Заклад відмовив клієнту',
+    'items_out_of_stock': 'Немає товару в наявності',
+    'out_of_stock': 'Немає товару в наявності',
+    'too_busy': 'Заклад перевантажений',
+    'other': 'Інше',
+  };
+  const actorsUA = {provider: 'заклад', bolt: 'Bolt', courier: 'кур\'єр', client: 'клієнт', system: 'система'};
+  if (labels[reason+'|'+actor]) return labels[reason+'|'+actor];
+  if (reasonsUA[reason]) {
+    const a = actorsUA[actor];
+    return reasonsUA[reason] + (a ? ' (' + a + ')' : '');
+  }
+  const a = actorsUA[actor] || actor || '';
+  return (reason || '—').replace(/_/g, ' ') + (a ? ' (' + a + ')' : '');
+}
+
+const REASON_COLORS = {
+  'manually_failed_by_cs|provider': '#dc2626',
+  'manually_failed_by_cs|bolt': '#ea580c',
+  'manually_failed_by_cs|courier': '#ca8a04',
+  'did_not_respond|provider': '#7c3aed',
+  'cannot_find_courier|provider': '#2563eb',
+  'manually_failed_by_user|client': '#6b7280',
+  'automatically_failed|bolt': '#0891b2',
+  'closed|provider': '#16a34a',
+  'do_not_wish_to_serve_this_client|provider': '#db2777',
+  'items_out_of_stock|provider': '#0d9488',
+  'other|provider': '#a16207',
+};
+
+// ─── Tab switching ───
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ─── Render ───
+const D = REPORT_DATA;
+const mData = mergeData(D.monthly.financial, D.monthly.operational, D.monthly.replacement_adjustment, D.monthly.failed_orders, D.monthly.acceptance_availability);
+const wData = mergeData(D.weekly.financial, D.weekly.operational, D.weekly.replacement_adjustment, D.weekly.failed_orders, D.weekly.acceptance_availability);
+
+// Header
+const periods = mData.map(d => d.period);
+const firstMonth = shortMonth(periods[0]);
+const lastMonth = shortMonth(periods[periods.length-1]);
+document.getElementById('reportSubtitle').textContent = `Bolt Food UA · ${firstMonth} – ${lastMonth} · Валюта: UAH (₴) · Бренд: ${D.partner_name}`;
+{
+  const guIso = (D.generated_at || '').replace(' UTC', 'Z').replace(' ', 'T');
+  let updated = D.generated_at;
+  try { const _d = new Date(guIso); if (!isNaN(_d)) updated = _d.toLocaleString('uk-UA', {timeZone:'Europe/Kyiv', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}) + ' за Києвом'; } catch (e) {}
+  document.getElementById('reportMeta').innerHTML = `<div class="updated-badge"><span class="dot"></span>Оновлено: ${updated}</div><div style="margin-top:7px">Дані: з ${D.data_start}<br>Тижневі: ${D.weekly_start} — ${D.weekly_end}</div>`;
+}
+
+function renderKPICards(containerId, data, labelFn) {
+  const last = data[data.length - 1];
+  const prev = data.length > 1 ? data[data.length - 2] : null;
+  const container = document.getElementById(containerId);
+  if (!last) { container.innerHTML = '<div class="card kpi">Немає даних</div>'; return; }
+
+  const kpis = [
+    {label:'Продажі партнера', sub:'₴', value: uah(last.fin_merchant_price_uah), change: prev ? changeBadge(last.fin_merchant_price_uah, prev.fin_merchant_price_uah) : ''},
+    {label:'Доставлені замовлення', sub:'', value: fmt(last.fin_orders), change: prev ? changeBadge(last.fin_orders, prev.fin_orders) : ''},
+    {label:'Середній чек', sub:'₴', value: n(last.fin_merchant_price_per_order,0) + ' ₴', change: prev ? changeBadge(last.fin_merchant_price_per_order, prev.fin_merchant_price_per_order) : ''},
+    {label:'Частка невдалих', sub:'замовлень', value: pct(last.fail_failed_rate_pct), change: prev ? ppBadge(last.fail_failed_rate_pct, prev.fail_failed_rate_pct, true) : '', color: last.fail_failed_rate_pct < 5 ? 'var(--green)' : last.fail_failed_rate_pct < 10 ? 'var(--yellow)' : 'var(--red)'},
+    {label:'Якісні замовлення', sub:'Honey', value: pct(last.ops_honey_order_rate), change: prev ? ppBadge(last.ops_honey_order_rate, prev.ops_honey_order_rate) : '', color: last.ops_honey_order_rate > 40 ? 'var(--green)' : ''},
+    {label:'Активні користувачі', sub:'', value: fmt(last.fin_active_users), change: prev ? changeBadge(last.fin_active_users, prev.fin_active_users) : ''},
+  ];
+
+  container.innerHTML = kpis.map(k =>
+    `<div class="card kpi">
+      <div class="kpi-label">${k.label}<span class="me">${k.sub}</span></div>
+      <div class="kpi-value" ${k.color ? `style="color:${k.color}"` : ''}>${k.value}</div>
+      <div class="kpi-sub">${k.change}</div>
+    </div>`
+  ).join('');
+}
+
+function renderCharts(prefix, data, labelFn) {
+  const labels = data.map(d => labelFn(d.period));
+
+  new Chart(document.getElementById(prefix+'-cGMV'), {data:{labels, datasets:[
+    {type:'bar', label:'Продажі партнера (₴)', data:data.map(d=>d.fin_merchant_price_uah), backgroundColor:'rgba(52,209,134,0.5)', borderRadius:4, yAxisID:'y'},
+    {type:'line', label:'Замовлення', data:data.map(d=>d.fin_orders), borderColor:'#ea580c', tension:.3, fill:false, yAxisID:'y1'}
+  ]}, options:dualY('Продажі (₴)','Замовлення')});
+
+  new Chart(document.getElementById(prefix+'-cOrders'), {type:'line', data:{labels, datasets:[
+    {label:'Доставлені', data:data.map(d=>d.fin_orders), borderColor:'#34D186', backgroundColor:'rgba(52,209,134,0.08)', fill:true, tension:.3},
+    {label:'Розміщені', data:data.map(d=>d.fail_total_placed), borderColor:'#7c3aed', borderDash:[5,3], tension:.3, fill:false}
+  ]}, options:defOpts});
+
+  new Chart(document.getElementById(prefix+'-cAOV'), {type:'line', data:{labels, datasets:[{label:'Середній чек (₴)', data:data.map(d=>d.fin_merchant_price_per_order), borderColor:'#0891b2', tension:.3, fill:false, pointRadius:5}]}, options:defOpts});
+
+  new Chart(document.getElementById(prefix+'-cUsers'), {type:'bar', data:{labels, datasets:[
+    {label:'Нові користувачі', data:data.map(d=>d.fin_users_activated), backgroundColor:'rgba(52,209,134,0.5)', borderRadius:3, yAxisID:'y'},
+    {label:'Активні користувачі', data:data.map(d=>d.fin_active_users), borderColor:'#2563eb', type:'line', tension:.3, yAxisID:'y1', fill:false}
+  ]}, options:dualY('Нові користувачі','Активні користувачі')});
+
+  new Chart(document.getElementById(prefix+'-cFail'), {type:'line', data:{labels, datasets:[
+    {label:'Невдалі замовлення %', data:data.map(d=>d.fail_failed_rate_pct), borderColor:'#dc2626', tension:.3, fill:false},
+    {label:'Проблемні замовлення %', data:data.map(d=>d.ops_bad_order_rate), borderColor:'#ea580c', tension:.3, fill:false}
+  ]}, options:defOpts});
+
+  new Chart(document.getElementById(prefix+'-cHoney'), {type:'line', data:{labels, datasets:[{label:'Якісні замовлення %', data:data.map(d=>d.ops_honey_order_rate), borderColor:'#34D186', tension:.3, fill:true, backgroundColor:'rgba(52,209,134,0.08)'}]}, options:defOpts});
+
+  new Chart(document.getElementById(prefix+'-cDuration'), {type:'bar', data:{labels, datasets:[
+    {label:'Час доставки (хв)', data:data.map(d=>d.ops_avg_delivery_minutes), backgroundColor:'rgba(37,99,235,0.4)', borderRadius:3, yAxisID:'y'},
+    {label:'Час кур\'єра (хв)', data:data.map(d=>d.ops_avg_courier_delivery_min), borderColor:'#ea580c', type:'line', tension:.3, yAxisID:'y1', fill:false}
+  ]}, options:dualY('Час доставки (хв)','Час кур\'єра (хв)')});
+
+  new Chart(document.getElementById(prefix+'-cLate'), {type:'line', data:{labels, datasets:[
+    {label:'Запізнення доставки %', data:data.map(d=>d.ops_late_delivery_rate), borderColor:'#dc2626', tension:.3, fill:false},
+    {label:'Запізнення збирання %', data:data.map(d=>d.ops_late_pickup_rate), borderColor:'#ea580c', tension:.3, fill:false}
+  ]}, options:defOpts});
+
+  new Chart(document.getElementById(prefix+'-cAdjust'), {type:'line', data:{labels, datasets:[{label:'Коригування %', data:data.map(d=>d.repl_adjustment_rate), borderColor:'#d97706', tension:.3, pointRadius:5, pointBackgroundColor:'#d97706'}]}, options:defOpts});
+  new Chart(document.getElementById(prefix+'-cReplace'), {type:'line', data:{labels, datasets:[{label:'Заміна товарів %', data:data.map(d=>d.repl_replacement_rate), borderColor:'#d97706', tension:.3, pointRadius:5, pointBackgroundColor:'#d97706'}]}, options:defOpts});
+
+  new Chart(document.getElementById(prefix+'-cMerchants'), {type:'bar', data:{labels, datasets:[
+    {label:'Активні заклади', data:data.map(d=>d.ops_active_stores), backgroundColor:'rgba(52,209,134,0.4)', borderRadius:3, yAxisID:'y'},
+    {label:'Доступність %', data:data.map(d=>d.aa_availability_rate), borderColor:'#34D186', type:'line', tension:.3, yAxisID:'y1', fill:false}
+  ]}, options:dualY('Заклади','Доступність (%)')});
+
+  const ratings = data.map(d=>d.aa_avg_rating).filter(v=>v!=null);
+  const minR = ratings.length ? Math.floor(Math.min(...ratings)*10)/10 - 0.1 : 4.5;
+  new Chart(document.getElementById(prefix+'-cRating'), {type:'line', data:{labels, datasets:[{label:'Рейтинг', data:data.map(d=>d.aa_avg_rating), borderColor:'#eab308', backgroundColor:'rgba(234,179,8,0.06)', fill:true, tension:.3, pointRadius:5}]}, options:{...defOpts, scales:{...defOpts.scales, y:{...defOpts.scales.y, min:Math.max(minR,4.0), max:5.0}}}});
+
+  // Failed orders by reason (stacked bar)
+  const reasonsMap = prefix === 'm' ? buildFailReasonsMap(D.monthly.failed_reasons) : buildFailReasonsMap(D.weekly.failed_reasons);
+  const allReasons = new Set();
+  for (const pm of Object.values(reasonsMap)) for (const k of Object.keys(pm)) allReasons.add(k);
+  const reasonsList = [...allReasons].sort((a,b) => {
+    const sumA = data.reduce((s,d) => s + (reasonsMap[d.period]?.[a]||0), 0);
+    const sumB = data.reduce((s,d) => s + (reasonsMap[d.period]?.[b]||0), 0);
+    return sumB - sumA;
+  });
+  new Chart(document.getElementById(prefix+'-cFailReasons'), {type:'bar', data:{labels, datasets: reasonsList.map(rk => {
+    const [reason, actor] = rk.split('|');
+    return {label: reasonLabel(reason, actor), data: data.map(d => reasonsMap[d.period]?.[rk] || 0), backgroundColor: REASON_COLORS[rk] || '#9ca3af', borderRadius:2};
+  })}, options:{...defOpts, scales:{...defOpts.scales, x:{...defOpts.scales.x, stacked:true}, y:{...defOpts.scales.y, stacked:true}}}});
+
+  // Failed Rate trend
+  new Chart(document.getElementById(prefix+'-cFailRate'), {type:'line', data:{labels, datasets:[{label:'Частка невдалих %', data:data.map(d=>d.fail_failed_rate_pct), borderColor:'#dc2626', backgroundColor:'rgba(220,38,38,0.05)', fill:true, tension:.3, pointRadius:5}]}, options:defOpts});
+
+}
+
+// ─── Monthly data rendering ───
+renderKPICards('m-kpi-cards', mData, shortMonth);
+renderCharts('m', mData, shortMonth);
+
+// ─── Network activation ───
+(function renderActivation(){
+  const net = D.network || {};
+  const s = net.summary || {};
+  const act = net.activation || [];
+  const base = Number(s.stores_in_base) || 0;
+  const ever = Number(s.stores_ever_active) || 0;
+  const a30 = Number(s.active_30d) || 0;
+  const firstDt = s.first_order_date ? String(s.first_order_date).slice(0,10) : '—';
+
+  const cardsEl = document.getElementById('m-activation-cards');
+  if (cardsEl) {
+    const cards = [
+      {label:'Закладів у мережі', value: fmt(base), sub:''},
+      {label:'Активовано (продавали)', value: fmt(ever), sub: base ? n(ever/base*100,0)+'% мережі' : ''},
+      {label:'Активні за 30 днів', value: fmt(a30), sub: base ? n(a30/base*100,0)+'% мережі' : ''},
+    ];
+    cardsEl.innerHTML = cards.map(c =>
+      `<div class="card kpi"><div class="kpi-label">${c.label}</div><div class="kpi-value">${c.value}</div><div class="kpi-sub stable">${c.sub}</div></div>`
+    ).join('');
+  }
+
+  if (act.length) {
+    const labels = act.map(d => shortMonth(d.period));
+    new Chart(document.getElementById('m-cActivation'), {data:{labels, datasets:[
+      {type:'bar', label:'Активні заклади', data:act.map(d=>d.active_stores), backgroundColor:'rgba(52,209,134,0.5)', borderRadius:3},
+      {type:'bar', label:'Нові заклади', data:act.map(d=>d.new_stores), backgroundColor:'rgba(37,99,235,0.5)', borderRadius:3}
+    ]}, options:defOpts});
+
+    let cum = 0;
+    const cumData = act.map(d => { cum += Number(d.new_stores)||0; return cum; });
+    new Chart(document.getElementById('m-cActivationCum'), {type:'line', data:{labels, datasets:[
+      {label:'Активовано закладів (накопич.)', data:cumData, borderColor:'#34D186', backgroundColor:'rgba(52,209,134,0.08)', fill:true, tension:.3, pointRadius:4},
+      {label:'Усього в мережі', data:labels.map(()=>base), borderColor:'#9ca3af', borderDash:[6,4], pointRadius:0, fill:false}
+    ]}, options:{...defOpts, scales:{...defOpts.scales, y:{...defOpts.scales.y, beginAtZero:true, suggestedMax: base+1}}}});
+  }
+
+  const noteEl = document.getElementById('m-activation-note');
+  if (noteEl) {
+    const inactive = Math.max(base - ever, 0);
+    noteEl.innerHTML = `<div class="insight-title">Головна точка зростання — активація мережі</div>`
+      + `<div class="insight-text">З <b>${base}</b> закладів мережі на доставці Bolt Food хоч раз продавали <b>${ever}</b> (${base?Math.round(ever/base*100):0}%), активні за останні 30 днів — <b>${a30}</b>. Ще <b>${inactive}</b> закладів поки не приймають замовлення. Основний потенціал зростання — підключення та розгін решти точок.</div>`;
+  }
+})();
+
+// Monthly sales table
+{
+  const last = mData[mData.length-1];
+  const prev = mData.length > 1 ? mData[mData.length-2] : null;
+  const tbl = document.getElementById('m-sales-table');
+  let html = '<thead><tr><th>Метрика</th><th>Опис</th>';
+  for (const d of mData) html += `<th>${shortMonth(d.period)}</th>`;
+  html += '</tr></thead><tbody>';
+  const rows = [
+    {name:'Продажі партнера (₴)', desc:'', key:'fin_merchant_price_uah', fmt:uah},
+    {name:'Доставлені замовлення', desc:'', key:'fin_orders', fmt:fmt},
+    {name:'Розміщені замовлення', desc:'', key:'fail_total_placed', fmt:fmt},
+    {name:'Середній чек (₴)', desc:'', key:'fin_merchant_price_per_order', fmt:v=>n(v,0)+' ₴'},
+    {name:'Нові користувачі', desc:'перше замовлення', key:'fin_users_activated', fmt:fmt},
+    {name:'Активні користувачі', desc:'', key:'fin_active_users', fmt:fmt},
+  ];
+  for (const r of rows) {
+    html += `<tr><td>${r.name}</td><td class="me">${r.desc}</td>`;
+    for (const d of mData) html += `<td>${r.fmt(d[r.key])}</td>`;
+    html += '</tr>';
+  }
+  html += '</tbody>';
+  tbl.innerHTML = html;
+}
+
+// Monthly ops table
+{
+  const tbl = document.getElementById('m-ops-table');
+  let html = '<thead><tr><th>Метрика</th><th>Опис</th>';
+  for (const d of mData) html += `<th>${shortMonth(d.period)}</th>`;
+  html += '</tr></thead><tbody>';
+  const rows = [
+    {name:'Частка невдалих', desc:'', key:'fail_failed_rate_pct', fmt:pct, inv:true},
+    {name:'Частка проблемних', desc:'', key:'ops_bad_order_rate', fmt:pct, inv:true},
+    {name:'Якісні замовлення', desc:'Honey', key:'ops_honey_order_rate', fmt:pct, inv:false},
+    {name:'Запізнення доставки', desc:'', key:'ops_late_delivery_rate', fmt:pct, inv:true},
+    {name:'Запізнення збирання', desc:'', key:'ops_late_pickup_rate', fmt:pct, inv:true},
+    {name:'Час доставки (хв)', desc:'', key:'ops_avg_delivery_minutes', fmt:v=>n(v,1), inv:true},
+    {name:'Коригування замовлень', desc:'Adjustment', key:'repl_adjustment_rate', fmt:pct, inv:true},
+    {name:'  ↳ Заміна товарів', desc:'Replacement (підмножина)', key:'repl_replacement_rate', fmt:pct, inv:true},
+    {name:'Активні заклади', desc:'', key:'ops_active_stores', fmt:fmt, inv:false},
+    {name:'Доступність', desc:'', key:'aa_availability_rate', fmt:pct, inv:false},
+    {name:'Прийняття замовлень', desc:'', key:'aa_acceptance_rate', fmt:pct, inv:false},
+    {name:'Рейтинг закладів', desc:'', key:'aa_avg_rating', fmt:v=>n(v,3), inv:false},
+    {name:'Повернення коштів', desc:'', key:'fin_refund_rate_pct', fmt:pct, inv:true},
+  ];
+  for (const r of rows) {
+    html += `<tr><td>${r.name}</td><td class="me">${r.desc}</td>`;
+    for (let i=0; i<mData.length; i++) {
+      const val = mData[i][r.key];
+      const prev = i > 0 ? mData[i-1][r.key] : null;
+      let style = '';
+      if (prev != null && val != null) {
+        const diff = val - prev;
+        const good = r.inv ? diff < -0.5 : diff > 0.5;
+        const bad = r.inv ? diff > 0.5 : diff < -0.5;
+        if (good) style = 'color:var(--green)';
+        else if (bad) style = 'color:var(--red)';
+      }
+      html += `<td style="${style}">${r.fmt(val)}</td>`;
+    }
+    html += '</tr>';
+  }
+  html += '</tbody>';
+  tbl.innerHTML = html;
+}
+
+// Monthly failed reasons table
+{
+  const tbl = document.getElementById('m-fail-table');
+  const reasonsMap = buildFailReasonsMap(D.monthly.failed_reasons);
+  const allReasons = new Set();
+  for (const pm of Object.values(reasonsMap)) for (const k of Object.keys(pm)) allReasons.add(k);
+  const sorted = [...allReasons].sort((a,b) => {
+    const sumA = mData.reduce((s,d) => s + (reasonsMap[d.period]?.[a]||0), 0);
+    const sumB = mData.reduce((s,d) => s + (reasonsMap[d.period]?.[b]||0), 0);
+    return sumB - sumA;
+  });
+
+  let html = '<thead><tr><th>Причина</th>';
+  for (const d of mData) html += `<th>${shortMonth(d.period)}</th>`;
+  html += '<th>Всього</th></tr></thead><tbody>';
+  for (const rk of sorted) {
+    const [reason, actor] = rk.split('|');
+    let total = 0;
+    html += `<tr><td style="white-space:nowrap">${reasonLabel(reason, actor)}</td>`;
+    for (const d of mData) {
+      const v = reasonsMap[d.period]?.[rk] || 0;
+      total += v;
+      html += `<td>${v || '—'}</td>`;
+    }
+    html += `<td><strong>${total}</strong></td></tr>`;
+  }
+  // Total row
+  html += '<tr style="font-weight:700;background:#f9fafb"><td>Всього Failed</td>';
+  let grandTotal = 0;
+  for (const d of mData) {
+    const v = d.fail_failed_total || 0;
+    grandTotal += Number(v);
+    html += `<td>${fmt(v)}</td>`;
+  }
+  html += `<td><strong>${fmt(grandTotal)}</strong></td></tr>`;
+  html += '</tbody>';
+  tbl.innerHTML = html;
+}
+
+// Monthly top stores
+{
+  const stores = D.top_stores;
+  if (stores && stores.length) {
+    const maxVal = Math.max(...stores.map(s => Number(s.merchant_price_uah)));
+    const container = document.getElementById('m-top-stores');
+    const cityColors = {};
+    const palette = ['var(--accent)','var(--purple)','var(--blue)','var(--orange)','var(--cyan)','var(--red)'];
+    let ci = 0;
+    container.innerHTML = stores.map(s => {
+      if (!cityColors[s.city_name]) cityColors[s.city_name] = palette[ci++ % palette.length];
+      const pctWidth = (Number(s.merchant_price_uah) / maxVal * 100).toFixed(0);
+      return `<div class="store-row"><span class="store-name">${s.provider_name} · ${s.city_name}</span><div class="bar-bg"><div class="bar-fill" style="width:${pctWidth}%;background:${cityColors[s.city_name]}"></div></div><span class="bar-val">${uah(s.merchant_price_uah)} · ${fmt(s.orders)} зам.</span></div>`;
+    }).join('');
+  }
+}
+
+// Monthly full KPI table
+{
+  const tbl = document.getElementById('m-kpi-table');
+  let html = '<thead><tr><th>Місяць</th><th>Продажі (₴)</th><th>Замовл.</th><th>Сер. чек (₴)</th><th>Нові кор.</th><th>Акт. кор.</th><th>Невдалі %</th><th>Проблемні %</th><th>Якісні %</th><th>Запізн. дост. %</th><th>Час (хв)</th><th>Доступн. %</th><th>Рейтинг</th><th>Акт. закл.</th></tr></thead><tbody>';
+  for (let i=0; i<mData.length; i++) {
+    const d = mData[i];
+    const isLast = i === mData.length-1;
+    html += `<tr ${isLast ? 'style="background:#f0fdf4;font-weight:600"' : ''}>`;
+    html += `<td>${isLast ? '<strong>' : ''}${shortMonth(d.period)}${isLast ? '</strong>' : ''}</td>`;
+    html += `<td>${uah(d.fin_merchant_price_uah)}</td>`;
+    html += `<td>${fmt(d.fin_orders)}</td>`;
+    html += `<td>${n(d.fin_merchant_price_per_order,0)} ₴</td>`;
+    html += `<td>${fmt(d.fin_users_activated)}</td>`;
+    html += `<td>${fmt(d.fin_active_users)}</td>`;
+    html += `<td>${pct(d.fail_failed_rate_pct)}</td>`;
+    html += `<td>${pct(d.ops_bad_order_rate)}</td>`;
+    html += `<td>${pct(d.ops_honey_order_rate)}</td>`;
+    html += `<td>${pct(d.ops_late_delivery_rate)}</td>`;
+    html += `<td>${n(d.ops_avg_delivery_minutes,1)}</td>`;
+    html += `<td>${pct(d.aa_availability_rate)}</td>`;
+    html += `<td>${n(d.aa_avg_rating,3)}</td>`;
+    html += `<td>${fmt(d.ops_active_stores)}</td>`;
+    html += '</tr>';
+  }
+  html += '</tbody>';
+  tbl.innerHTML = html;
+}
+
+// ─── Weekly data rendering ───
+if (wData.length) {
+  document.getElementById('w-kpi-title').textContent = `Ключові показники (${shortWeek(D.weekly_start)} – ${shortWeek(D.weekly_end)})`;
+  renderKPICards('w-kpi-cards', wData, shortWeek);
+  renderCharts('w', wData, shortWeek);
+}
+
+// ─── Activity tab: per-store availability over last 4 weeks ───
+(function renderActivity(){
+  const rows = D.store_activity || [];
+  if (!rows.length) {
+    document.getElementById('a-table').innerHTML = '<tbody><tr><td>Немає даних про активність локацій.</td></tr></tbody>';
+    return;
+  }
+
+  const weeks = [...new Set(rows.map(r => r.week))].sort();
+  const avg = arr => { const v = arr.filter(x => x != null); return v.length ? v.reduce((a,b)=>a+Number(b),0)/v.length : null; };
+
+  // Group by provider
+  const byProv = {};
+  for (const r of rows) {
+    const id = r.provider_id;
+    if (!byProv[id]) byProv[id] = {name: r.provider_name, city: r.city_name, av: {}, ac: {}};
+    byProv[id].av[r.week] = r.availability_rate == null ? null : Number(r.availability_rate);
+    byProv[id].ac[r.week] = r.acceptance_rate == null ? null : Number(r.acceptance_rate);
+  }
+
+  const stores = Object.values(byProv).map(s => {
+    const avSeries = weeks.map(w => s.av[w] ?? null);
+    const acSeries = weeks.map(w => s.ac[w] ?? null);
+    const avgAv = avg(avSeries);
+    const first = avSeries.find(v => v != null);
+    const lastVals = [...avSeries].reverse();
+    const last = lastVals.find(v => v != null);
+    return {...s, avSeries, acSeries, avgAv: avgAv == null ? 0 : avgAv,
+            trend: (first != null && last != null) ? (last - first) : null,
+            lastAv: last == null ? null : last};
+  }).sort((a,b) => b.avgAv - a.avgAv);
+
+  // Tiers
+  const tierOf = v => v == null ? 'nodata' : v === 0 ? 'inactive' : v < 30 ? 'critical' : v < 60 ? 'low' : v < 85 ? 'mid' : 'active';
+  const tierColor = {active:'#16a34a', mid:'#84cc16', low:'#eab308', critical:'#f97316', inactive:'#dc2626', nodata:'#e5e7eb'};
+  const tierLabel = {active:'Активні', mid:'Помірні', low:'Низькі', critical:'Критичні', inactive:'Неактивні'};
+  const heat = v => {
+    if (v == null) return `<span class="heat" style="background:#f3f4f6;color:#9ca3af">—</span>`;
+    const t = tierOf(v);
+    const txt = (t === 'active' || t === 'inactive') ? '#fff' : '#1a1a2e';
+    return `<span class="heat" style="background:${tierColor[t]};color:${txt}">${n(v,0)}%</span>`;
+  };
+
+  // KPI cards
+  const lastWeek = weeks[weeks.length-1];
+  const prevWeek = weeks.length > 1 ? weeks[weeks.length-2] : null;
+  const netAvg = w => avg(stores.map(s => s.av?.[w] ?? null));
+  const lastNet = netAvg(lastWeek), prevNet = prevWeek ? netAvg(prevWeek) : null;
+  const counts = {active:0, mid:0, low:0, critical:0, inactive:0};
+  for (const s of stores) { const t = tierOf(s.lastAv); if (counts[t] != null) counts[t]++; }
+  const fullyInactive = stores.filter(s => s.avgAv === 0).length;
+
+  document.getElementById('a-title').textContent =
+    `Активність локацій · ${shortWeek(weeks[0])} – ${shortWeek(lastWeek)} (${stores.length} локацій, ${weeks.length} тижні)`;
+
+  const kpis = [
+    {label:'Сер. доступність мережі', sub:'останній тиждень', value: pct(lastNet),
+     change: prevNet != null ? ppBadge(lastNet, prevNet) : '',
+     color: lastNet >= 85 ? 'var(--green)' : lastNet >= 60 ? 'var(--yellow)' : 'var(--red)'},
+    {label:'Активні локації', sub:'≥85% ост. тижня', value: String(counts.active),
+     color:'var(--green)'},
+    {label:'Низька / критична', sub:'<60% ост. тижня', value: String(counts.low + counts.critical),
+     color:'var(--yellow)'},
+    {label:'Неактивні', sub:'0% весь період', value: String(fullyInactive),
+     color: fullyInactive ? 'var(--red)' : 'var(--green)'},
+  ];
+  document.getElementById('a-kpi-cards').innerHTML = kpis.map(k =>
+    `<div class="card kpi"><div class="kpi-label">${k.label}<span class="me">${k.sub}</span></div>`
+    + `<div class="kpi-value" ${k.color?`style="color:${k.color}"`:''}>${k.value}</div>`
+    + `<div class="kpi-sub">${k.change||''}</div></div>`).join('');
+
+  // Network dynamics chart
+  const wl = weeks.map(shortWeek);
+  new Chart(document.getElementById('a-cNetwork'), {type:'line', data:{labels:wl, datasets:[
+    {label:'Доступність %', data:weeks.map(w=>netAvg(w)), borderColor:'#34D186', backgroundColor:'rgba(52,209,134,0.10)', fill:true, tension:.3, pointRadius:5},
+    {label:'Прийняття %', data:weeks.map(w=>avg(stores.map(s=>s.ac?.[w] ?? null))), borderColor:'#2563eb', tension:.3, fill:false, pointRadius:4}
+  ]}, options:{...defOpts, scales:{...defOpts.scales, y:{...defOpts.scales.y, min:0, max:100}}}});
+
+  // Tier distribution per week (stacked)
+  const tierKeys = ['active','mid','low','critical','inactive'];
+  const tierCountByWeek = w => {
+    const c = {active:0, mid:0, low:0, critical:0, inactive:0};
+    for (const s of stores) { const t = tierOf(s.av?.[w] ?? null); if (c[t]!=null) c[t]++; }
+    return c;
+  };
+  const perWeekCounts = weeks.map(tierCountByWeek);
+  new Chart(document.getElementById('a-cTiers'), {type:'bar', data:{labels:wl, datasets: tierKeys.map(t => ({
+    label: tierLabel[t], data: perWeekCounts.map(c => c[t]), backgroundColor: tierColor[t], borderRadius:2
+  }))}, options:{...defOpts, scales:{...defOpts.scales, x:{...defOpts.scales.x, stacked:true}, y:{...defOpts.scales.y, stacked:true}}}});
+
+  // Insights
+  const top = stores.filter(s=>s.avgAv>0).slice(0,3);
+  const improvers = [...stores].filter(s=>s.trend!=null && s.trend>5).sort((a,b)=>b.trend-a.trend).slice(0,3);
+  const decliners = [...stores].filter(s=>s.trend!=null && s.trend<-5).sort((a,b)=>a.trend-b.trend).slice(0,3);
+  const dead = stores.filter(s=>s.avgAv===0);
+  const nm = s => `${s.name} (${s.city})`;
+  const ins = [];
+  if (top.length) ins.push({cls:'good', t:'Найактивніші локації',
+    x:`Лідери за доступністю: ${top.map(s=>`<b>${nm(s)}</b> — ${n(s.avgAv,0)}%`).join(', ')}.`});
+  if (improvers.length) ins.push({cls:'good', t:'Покращили активність',
+    x:`${improvers.map(s=>`<b>${nm(s)}</b> (+${n(s.trend,0)} пп)`).join(', ')} — зростання доступності за період.`});
+  if (decliners.length) ins.push({cls:'warn', t:'Падіння активності',
+    x:`${decliners.map(s=>`<b>${nm(s)}</b> (${n(s.trend,0)} пп)`).join(', ')} — потребують уваги, доступність знизилась.`});
+  if (dead.length) ins.push({cls:'action', t:`Неактивні локації: ${dead.length}`,
+    x:`Весь період 0% доступності (не приймають замовлення): ${dead.map(nm).join(', ')}. Це головний резерв зростання — потрібне підключення/реактивація.`});
+  document.getElementById('a-insights').innerHTML = ins.map(i =>
+    `<div class="insight ${i.cls}"><div class="insight-title">${i.t}</div><div class="insight-text">${i.x}</div></div>`).join('');
+
+  // Ranking table
+  let html = '<thead><tr><th>#</th><th>Локація</th><th>Місто</th>';
+  for (const w of weeks) html += `<th class="week">${shortWeek(w)}</th>`;
+  html += '<th>Сер. дост.</th><th>Тренд</th></tr></thead><tbody>';
+  stores.forEach((s, i) => {
+    html += `<tr><td class="rank">${i+1}</td>`;
+    html += `<td class="store" title="${s.name}">${s.name}</td>`;
+    html += `<td>${s.city || '—'}</td>`;
+    for (let k=0;k<weeks.length;k++) {
+      const av = s.avSeries[k], ac = s.acSeries[k];
+      html += `<td>${heat(av)}<div class="me" style="font-size:9px">Acc ${ac==null?'—':n(ac,0)+'%'}</div></td>`;
+    }
+    html += `<td><b>${n(s.avgAv,0)}%</b></td>`;
+    if (s.trend == null) html += '<td class="trend-flat">—</td>';
+    else {
+      const cls = s.trend > 2 ? 'trend-up' : s.trend < -2 ? 'trend-down' : 'trend-flat';
+      const arr = s.trend > 2 ? '▲' : s.trend < -2 ? '▼' : '≈';
+      html += `<td class="${cls}">${arr} ${s.trend>0?'+':''}${n(s.trend,0)} пп</td>`;
+    }
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  document.getElementById('a-table').innerHTML = html;
+})();
+</script>
+</body>
+</html>
